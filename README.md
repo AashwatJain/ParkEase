@@ -1,6 +1,6 @@
 # 🅿️ ParkEase — Mall Parking Management System
 
-A RESTful backend API for managing mall parking operations — slot allotment, QR + OTP based entry/exit, duration-based billing, and multi-role access control.
+A RESTful backend API for managing mall parking operations — slot allotment, QR code based entry/exit, duration-based billing, and multi-role access control.
 
 ## 🛠️ Tech Stack
 
@@ -15,7 +15,7 @@ A RESTful backend API for managing mall parking operations — slot allotment, Q
 - **3 Roles** — User, Mall Owner, Super Admin with role-based authorization
 - **Mall Registration** with admin approval workflow
 - **Auto Slot Allotment** using atomic operations (no double booking)
-- **QR Code + OTP** verification at entry & exit
+- **QR Code** verification at entry & exit
 - **Duration-based Billing** — `ceil(hours) × rate`
 - **Email Notifications** — booking confirmation + invoice
 - **Cron Job** — auto-expire stale bookings (24hr+)
@@ -60,7 +60,7 @@ src/
 ├── controllers/   # Route handlers
 ├── routes/        # API route definitions
 ├── middleware/     # Auth & role verification
-├── utils/         # QR, OTP, Email helpers
+├── utils/         # QR, Email, Error & Response helpers
 └── jobs/          # Cron jobs
 ```
 

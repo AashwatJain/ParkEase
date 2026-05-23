@@ -1,0 +1,33 @@
+{
+  "name": "mall-parking-system",
+  "version": "1.0.0",
+  "description": "A RESTful backend API for managing mall parking operations — slot allotment, QR + OTP based entry/exit, duration-based billing, and multi-role access control.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon -r dotenv/config server.js",
+    "start": "node -r dotenv/config server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AashwatJain/mall-parking-system.git"
+  },
+  "keywords": [],
+  "author": "mickey",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/AashwatJain/mall-parking-system/issues"
+  },
+  "homepage": "https://github.com/AashwatJain/mall-parking-system#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.6.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
