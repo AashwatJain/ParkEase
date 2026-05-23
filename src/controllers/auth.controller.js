@@ -53,7 +53,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const isPassValid = await user.isPasswordCorrect(password);
 
-  if (!isPassValid) throw new ApiError(400, "Invaid Credentials");
+  if (!isPassValid) throw new ApiError(401, "Invaid Credentials");
 
   const token = user.generateToken();
 
