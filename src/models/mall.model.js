@@ -36,6 +36,10 @@ const mallSchema = new mongoose.Schema(
     rejectionReason: {
       type: String,
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true },
 );
