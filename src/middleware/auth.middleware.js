@@ -4,6 +4,7 @@ import { asyncHandler } from "../utils/asyncHandler.utils.js";
 
 const verifyJWT = asyncHandler(async (req, res, next) => {
   const { token } = req.cookies;
+  console.log(token);
   if (!token) throw new ApiError(401, "Unauthorized request. No token found");
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);

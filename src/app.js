@@ -9,8 +9,10 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 import authRouter from "./routes/auth.route.js";
+import mallRouter from "./routes/mall.route.js";
 
 app.use("/api/auth", authRouter);
+app.use("/api/malls", mallRouter);
 
 app.use(errorHandler);
 

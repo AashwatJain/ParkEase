@@ -6,6 +6,8 @@ import { ApiResponse } from "../utils/ApiResponse.utils.js";
 const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password, role = "user" } = req.body;
 
+  if (role === "admin") throw new ApiError(401, "Unauthorized");
+
   if (!username || !email || !password)
     throw new ApiError(400, "All fields are required");
 
