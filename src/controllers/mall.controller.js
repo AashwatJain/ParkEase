@@ -5,31 +5,22 @@ import { ApiResponse } from "../utils/ApiResponse.utils.js";
 import { Rating } from "../models/rating.model.js";
 
 const createMall = asyncHandler(async (req, res) => {
-  const { name, address, pricing, totalFloors } = req.body;
+  const { name, address, pricing } = req.body;
   const ownerId = req.user.id;
-
-  console.log(name, address, pricing, totalFloors);
 
   if (!name?.trim() || !address?.trim()) {
     throw new ApiError(400, "Name and address cannot be empty");
-  }
-
-  if (!totalFloors || totalFloors < 1) {
-    throw new ApiError(400, "A mall must have at least 1 floor");
   }
 
   if (pricing?.bike === undefined || pricing?.car === undefined) {
     throw new ApiError(400, "Pricing for both bike and car is required");
   }
 
-  console.log();
-
   const mall = await Mall.create({
     owner: ownerId,
     name,
     address,
     pricing,
-    totalFloors,
   });
 
   console.log(mall);
@@ -102,12 +93,11 @@ const updateMall = asyncHandler(async (req, res) => {
   if (!mall.owner.equals(ownerId) && req.user.role !== "admin")
     throw new ApiError(403, "Forbidden");
 
-  const { name, address, pricing, totalFloors } = req.body;
+  const { name, address, pricing } = req.body;
 
   if (name) mall.name = name;
   if (address) mall.address = address;
   if (pricing) mall.pricing = pricing;
-  if (totalFloors) mall.totalFloors = totalFloors;
 
   mall.status = "pending";
 

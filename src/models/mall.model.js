@@ -24,10 +24,6 @@ const mallSchema = new mongoose.Schema(
         type: Number,
       },
     },
-    totalFloors: {
-      type: Number,
-      required: true,
-    },
     status: {
       type: String,
       enum: ["pending", "rejected", "approved"],
@@ -51,5 +47,21 @@ const mallSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
+
+mallSchema.methods.totalRevenue(async function () {
+  const result = await mongoose.model("Booking").aggregate([
+    {
+      $match: this._id,
+      status: "completed◊",
+    },
+    {
+      $group: {
+        _id: null,
+        totalRevenue: { $sum: "$fare" },
+      },
+    },
+  ]);
+  return result.length > 0 ? result[0].totalRevenue : 0;
+});
 
 export const Mall = mongoose.model("Mall", mallSchema);

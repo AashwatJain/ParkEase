@@ -49,6 +49,11 @@ const bookingSchema = new mongoose.Schema(
       type: Date,
     },
 
+    fare: {
+      type: Number,
+      default: 0,
+    },
+
     qrCode: {
       type: String,
     },
@@ -82,7 +87,7 @@ bookingSchema.methods.calculateFare = async function (exitTime) {
     throw new ApiError(404, "Mall details not found for fare calculation");
   }
 
-  return mall.pricing[this.vehicleType] * Math.ceil(totalTime / 1000 / 60 / 60);
+  return this.fare = mall.pricing[this.vehicleType] * Math.ceil(totalTime / 1000 / 60 / 60);
 };
 
 export const Booking = mongoose.model("Booking", bookingSchema);

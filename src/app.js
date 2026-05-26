@@ -10,9 +10,14 @@ app.use(cookieParser());
 
 import authRouter from "./routes/auth.route.js";
 import mallRouter from "./routes/mall.route.js";
+import floorRouter from "./routes/floor.route.js";
+import AdminRouter from "./routes/admin.route.js";
+
 
 app.use("/api/auth", authRouter);
 app.use("/api/malls", mallRouter);
+app.use("/api/malls/:mallId/floors", floorRouter);
+app.use("/api/admin",AdminRouter)
 
 app.use(errorHandler);
 

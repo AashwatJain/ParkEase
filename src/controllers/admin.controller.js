@@ -1,0 +1,84 @@
+import { asyncHandler } from "../utils/asyncHandler.utils.js";
+import { ApiError } from "../utils/ApiError.utils.js";
+import { ApiResponse } from "../utils/ApiResponse.utils.js";
+import { Mall } from "../models/mall.model.js";
+import { User } from "../models/user.model.js";
+import { Booking } from "../models/booking.model.js";
+
+const getPendingMalls = asyncHandler(async (req, res) => {
+  const malls = await Mall.find({
+    status: "pending",
+  });
+
+  res.status(200).json(new ApiResponse(200, { malls }, "Request Successful"));
+});
+
+const approveMalls = asyncHandler(async (req, res) => {
+  const { mallId } = req.params;
+
+  const mall = await Mall.findByIdAndUpdate(
+    mallId,
+    { status: "approved" },
+    { new: true },
+  );
+
+  if (!mall) {
+    throw new ApiError(404, "Mall not found");
+  }
+
+  res.status(200).json(new ApiResponse(200, { mall }, "Request Successful"));
+});
+
+const rejectMalls = asyncHandler(async (req, res) => {
+  const { mallId } = req.params;
+
+  const { reason } = req.body;
+
+  const mall = await Mall.findByIdAndUpdate(
+    mallId,
+    { status: "rejected", rejectionReason: reason },
+    { new: true },
+  );
+
+  if (!mall) {
+    throw new ApiError(404, "Mall not found");
+  }
+
+  res.status(200).json(new ApiResponse(200, { mall }, "Request Successful"));
+});
+
+const getstats = asyncHandler(async (req, res) => {
+  const [totalUsers, totalMalls, totalBookings, revenueData] =
+    await Promise.all([
+      User.countDocuments(),
+      Mall.countDocuments(),
+      Booking.countDocuments(),
+      Booking.aggregate([
+        {
+          $match: { status: "completed" },
+        },
+        {
+          $group: {
+            _id: null,
+            totalRevenue: { $sum: "$fare" },
+          },
+        },
+      ]),
+    ]);
+
+  const totalRevenue = revenueData.length > 0 ? revenueData[0].totalRevenue : 0;
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { totalUsers, totalMalls, totalBookings, totalRevenue },
+        "Request Successful",
+      ),
+    );
+});
+
+// const allMalls = asyncHandler(async (req, res) => {});
+
+export { getPendingMalls, approveMalls, rejectMalls, getstats };
