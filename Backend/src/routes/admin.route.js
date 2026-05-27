@@ -1,6 +1,6 @@
 import express from "express";
-import { authorizeRoles } from "../middleware/role.middleware";
-import { verifyJWT } from "../middleware/auth.middleware";
+import { authorizeRoles } from "../middleware/role.middleware.js";
+import { verifyJWT } from "../middleware/auth.middleware.js";
 import {
   getPendingMalls,
   approveMalls,
