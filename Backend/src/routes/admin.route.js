@@ -6,23 +6,22 @@ import {
   approveMalls,
   rejectMalls,
   getstats,
+  allMalls,
+  ban,
+  unban,
 } from "../controllers/admin.controller.js";
 
 const router = express.Router();
 
-app.get("/malls/pending", verifyJWT, authorizeRoles("admin"), getPendingMalls);
-app.patch(
-  "/malls/:mallId/approve",
-  verifyJWT,
-  authorizeRoles("admin"),
-  approveMalls,
-);
-app.patch(
-  "/malls/:mallId/reject",
-  verifyJWT,
-  authorizeRoles("admin"),
-  rejectMalls,
-);
-app.get("/platform-stats", verifyJWT, authorizeRoles("admin"), getstats);
+app.use(verifyJWT, authorizeRoles("admin"));
+
+app.get("/malls/pending", getPendingMalls);
+app.patch("/malls/:mallId/approve", approveMalls);
+app.patch("/malls/:mallId/reject", rejectMalls);
+app.get("/platform-stats", getstats);
+
+app.get("/all-malls", allMalls);
+app.patch("/unban/:userId", ban);
+app.patch("/unban/:userId", unban);
 
 export default router;

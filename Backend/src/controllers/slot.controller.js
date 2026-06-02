@@ -1,7 +1,7 @@
 import { ApiError } from "../utils/ApiError.utils.js";
 import { ApiResponse } from "../utils/ApiResponse.utils.js";
 import { asyncHandler } from "../utils/asyncHandler.utils.js";
-import { Slot } from "./slot.model.js";
+import { Slot } from "../models/slot.model.js";
 
 const slotMaintenance = asyncHandler(async (req, res) => {
   const { slotId } = req.params;

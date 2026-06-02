@@ -1,0 +1,21 @@
+import express from "express";
+import { verifyJWT } from "../middleware/auth.middleware.js";
+import { authorizeRoles } from "../middleware/role.middleware.js";
+import {
+  entry,
+  exit,
+  getBooking,
+  getBookings,
+} from "../controllers/booking.controller.js";
+
+const router = express.Router();
+
+router.use(verifyJWT);
+router.use(authorizeRoles("user"));
+
+router.post("/entry", entry);
+router.patch("/exit/:bookingId", exit);
+router.get("/my", getBookings);
+router.get("/:bookingId", getBooking);
+
+export default router;

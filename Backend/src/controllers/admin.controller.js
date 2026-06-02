@@ -79,6 +79,45 @@ const getstats = asyncHandler(async (req, res) => {
     );
 });
 
-// const allMalls = asyncHandler(async (req, res) => {});
+// agg lagega baad mai dekhte hai isse 
+const allMalls = asyncHandler(async (req, res) => {
 
-export { getPendingMalls, approveMalls, rejectMalls, getstats };
+});
+
+const ban = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await User.findById(userId);
+
+  if (!user) throw new ApiError(404, "User not found");
+
+  user.isBanned = true;
+
+  await user.save();
+
+  res.status(200).json(new ApiResponse(200, {}, "User Banned"));
+});
+
+const unban = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await User.findById(userId);
+
+  if (!user) throw new ApiError(404, "User not found");
+
+  user.isBanned = false;
+
+  await user.save();
+
+  res.status(200).json(new ApiResponse(200, {}, "User Unbanned"));
+});
+
+export {
+  getPendingMalls,
+  approveMalls,
+  rejectMalls,
+  getstats,
+  allMalls,
+  ban,
+  unban,
+};

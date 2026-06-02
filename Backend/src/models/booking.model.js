@@ -78,16 +78,17 @@ bookingSchema.pre("validate", async function () {
 });
 
 bookingSchema.methods.calculateFare = async function (exitTime) {
-  this.exitTime = exitTime;
-  const totalTime = exitTime - this.entryTime;
-
   const mall = await Mall.findById(this.mall);
 
   if (!mall) {
     throw new ApiError(404, "Mall details not found for fare calculation");
   }
 
-  return this.fare = mall.pricing[this.vehicleType] * Math.ceil(totalTime / 1000 / 60 / 60);
+  this.exitTime = exitTime;
+  const totalTime = exitTime - this.entryTime;
+
+  return (this.fare =
+    mall.pricing[this.vehicleType] * Math.ceil(totalTime / 1000 / 60 / 60));
 };
 
 export const Booking = mongoose.model("Booking", bookingSchema);
