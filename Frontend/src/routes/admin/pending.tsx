@@ -39,10 +39,10 @@ function Pending() {
     }
   };
   const reject = async (id: string) => {
-    const rejectionReason = reasons[id];
-    if (!rejectionReason) return toast.error("Provide a reason");
+    const reason = reasons[id];
+    if (!reason) return toast.error("Provide a reason");
     try {
-      await api.patch(`/admin/malls/${id}/reject`, { rejectionReason });
+      await api.patch(`/admin/malls/${id}/reject`, { reason });
       toast.success("Rejected");
       fetchPending();
     } catch (err: any) {
@@ -78,7 +78,7 @@ function Pending() {
                       <MapPin className="h-3.5 w-3.5" /> {m.city}
                     </div>
                     <p className="mt-3 text-sm text-[#2D2D2D]">
-                      Bike ₹{m.bikeRatePerHour}/hr · Car ₹{m.carRatePerHour}/hr
+                      Bike ₹{m.pricing?.bike}/hr · Car ₹{m.pricing?.car}/hr
                     </p>
                   </div>
                   <span style={display} className="rounded-full border border-black/15 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#2D2D2D]">

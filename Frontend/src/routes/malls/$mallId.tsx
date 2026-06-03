@@ -79,10 +79,10 @@ function MallDetail() {
           </div>
           <div className="mt-6 flex flex-wrap gap-2">
             <div style={display} className="rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#0D0D0D]">
-              <Bike className="mr-1.5 inline h-3.5 w-3.5" /> ₹{mall.bikeRatePerHour}/hr · Bike
+              <Bike className="mr-1.5 inline h-3.5 w-3.5" /> ₹{mall.pricing?.bike}/hr · Bike
             </div>
             <div style={display} className="rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#0D0D0D]">
-              <Car className="mr-1.5 inline h-3.5 w-3.5" /> ₹{mall.carRatePerHour}/hr · Car
+              <Car className="mr-1.5 inline h-3.5 w-3.5" /> ₹{mall.pricing?.car}/hr · Car
             </div>
           </div>
         </div>
@@ -164,7 +164,7 @@ function MallDetail() {
                 style={display}
                 className="w-full rounded-xl bg-[#0D0D0D] py-3 text-xs font-bold uppercase tracking-widest text-[#F5F3EE] transition-colors hover:bg-[#2D2D2D] disabled:opacity-60"
               >
-                {booking ? "Booking..." : `Book at ₹${vehicleType === "bike" ? mall.bikeRatePerHour : mall.carRatePerHour}/hr`}
+                {booking ? "Booking..." : `Book at ₹${vehicleType === "bike" ? mall.pricing?.bike : mall.pricing?.car}/hr`}
               </button>
               {!user && <p className="text-center text-xs text-[#2D2D2D]/60">You'll be asked to log in</p>}
             </form>

@@ -11,7 +11,7 @@ import {
 const router = express.Router();
 
 router.use(verifyJWT);
-router.use(authorizeRoles("user"));
+router.use(authorizeRoles("user", "admin", "mall-owner"));
 
 router.post("/entry", entry);
 router.patch("/exit/:bookingId", exit);

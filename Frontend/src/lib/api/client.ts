@@ -5,6 +5,13 @@ export const api = axios.create({
   withCredentials: true,
 });
 
+api.interceptors.response.use((response) => {
+  if (response.data && response.data.data) {
+    response.data = response.data.data;
+  }
+  return response;
+});
+
 export type Role = "user" | "mall-owner" | "admin";
 
 export interface User {
@@ -21,8 +28,10 @@ export interface Mall {
   name: string;
   address?: string;
   city: string;
-  bikeRatePerHour: number;
-  carRatePerHour: number;
+  pricing?: {
+    bike: number;
+    car: number;
+  };
   status?: "pending" | "approved" | "rejected";
   averageRating?: number;
   owner?: { _id: string; username: string; email: string } | string;
@@ -40,16 +49,14 @@ export interface Floor {
 
 export interface Booking {
   _id: string;
-  mall: Mall | string;
-  mallName?: string;
+  mall: Mall | { _id: string; name?: string; city?: string } | string;
   vehicleType: "bike" | "car";
   vehicleNumber: string;
-  slotNumber?: string;
-  floorNumber?: number;
+  slot?: { _id: string; slotNumber: string } | string;
+  floor?: { _id: string; floorNumber: number } | string;
   entryTime: string;
   exitTime?: string;
-  amount?: number;
+  fare?: number;
   status: "active" | "completed";
   qrCode?: string;
-  rated?: boolean;
 }

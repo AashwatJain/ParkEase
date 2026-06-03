@@ -38,7 +38,7 @@ ratingSchema.index({ booking: 1 }, { unique: true });
 
 // kuch toh naya h yeh
 ratingSchema.statics.calculateAvgRating = async function (mallId) {
-  const stats = await this.aggreagte([
+  const stats = await this.aggregate([
     { $match: { mall: mallId } },
     {
       $group: {

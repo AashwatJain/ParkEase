@@ -48,11 +48,13 @@ const mallSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-mallSchema.methods.totalRevenue(async function () {
+mallSchema.methods.totalRevenue = async function () {
   const result = await mongoose.model("Booking").aggregate([
     {
-      $match: this._id,
-      status: "completed◊",
+      $match: {
+        mall: this._id,
+        status: "completed",
+      },
     },
     {
       $group: {
@@ -62,6 +64,6 @@ mallSchema.methods.totalRevenue(async function () {
     },
   ]);
   return result.length > 0 ? result[0].totalRevenue : 0;
-});
+};
 
 export const Mall = mongoose.model("Mall", mallSchema);

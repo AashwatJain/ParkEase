@@ -179,6 +179,14 @@ CORS_ORIGIN=*
 | PATCH | `/ban/:userId` | Ban user |
 | PATCH | `/unban/:userId` | Unban user |
 
+### Mall Owner Dashboard — `/api/owner`
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/dashboard/:mallId` | Real-time: occupied, available, today's revenue | ✅ Owner / Admin |
+| GET | `/analytics/:mallId` | Peak hours, busiest floor, avg duration | ✅ Owner / Admin |
+| GET | `/revenue/:mallId` | Revenue: daily / weekly / monthly breakdown | ✅ Owner / Admin |
+| GET | `/ratings/:mallId` | Avg rating, total reviews, rating distribution | ✅ Owner / Admin |
+
 ---
 
 ## 🔄 Parking Flow

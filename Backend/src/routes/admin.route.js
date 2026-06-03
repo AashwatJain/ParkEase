@@ -13,15 +13,15 @@ import {
 
 const router = express.Router();
 
-app.use(verifyJWT, authorizeRoles("admin"));
+router.use(verifyJWT, authorizeRoles("admin"));
 
-app.get("/malls/pending", getPendingMalls);
-app.patch("/malls/:mallId/approve", approveMalls);
-app.patch("/malls/:mallId/reject", rejectMalls);
-app.get("/platform-stats", getstats);
+router.get("/malls/pending", getPendingMalls);
+router.patch("/malls/:mallId/approve", approveMalls);
+router.patch("/malls/:mallId/reject", rejectMalls);
+router.get("/platform-stats", getstats);
 
-app.get("/all-malls", allMalls);
-app.patch("/unban/:userId", ban);
-app.patch("/unban/:userId", unban);
+router.get("/all-malls", allMalls);
+router.patch("/ban/:userId", ban);
+router.patch("/unban/:userId", unban);
 
 export default router;

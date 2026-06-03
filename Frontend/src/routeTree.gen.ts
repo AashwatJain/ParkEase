@@ -10,8 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as OwnerRouteImport } from './routes/owner'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as BookingsRouteImport } from './routes/bookings'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MallsIndexRouteImport } from './routes/malls/index'
 import { Route as OwnerRegisterMallRouteImport } from './routes/owner/register-mall'
@@ -28,6 +30,11 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OwnerRoute = OwnerRouteImport.update({
+  id: '/owner',
+  path: '/owner',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -36,6 +43,11 @@ const LoginRoute = LoginRouteImport.update({
 const BookingsRoute = BookingsRouteImport.update({
   id: '/bookings',
   path: '/bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -49,14 +61,14 @@ const MallsIndexRoute = MallsIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const OwnerRegisterMallRoute = OwnerRegisterMallRouteImport.update({
-  id: '/owner/register-mall',
-  path: '/owner/register-mall',
-  getParentRoute: () => rootRouteImport,
+  id: '/register-mall',
+  path: '/register-mall',
+  getParentRoute: () => OwnerRoute,
 } as any)
 const OwnerMallsRoute = OwnerMallsRouteImport.update({
-  id: '/owner/malls',
-  path: '/owner/malls',
-  getParentRoute: () => rootRouteImport,
+  id: '/malls',
+  path: '/malls',
+  getParentRoute: () => OwnerRoute,
 } as any)
 const MallsMallIdRoute = MallsMallIdRouteImport.update({
   id: '/malls/$mallId',
@@ -64,35 +76,37 @@ const MallsMallIdRoute = MallsMallIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminPendingRoute = AdminPendingRouteImport.update({
-  id: '/admin/pending',
-  path: '/admin/pending',
-  getParentRoute: () => rootRouteImport,
+  id: '/pending',
+  path: '/pending',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminManageRoute = AdminManageRouteImport.update({
-  id: '/admin/manage',
-  path: '/admin/manage',
-  getParentRoute: () => rootRouteImport,
+  id: '/manage',
+  path: '/manage',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
-  id: '/admin/dashboard',
-  path: '/admin/dashboard',
-  getParentRoute: () => rootRouteImport,
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRoute,
 } as any)
 const OwnerFloorsMallIdRoute = OwnerFloorsMallIdRouteImport.update({
-  id: '/owner/floors/$mallId',
-  path: '/owner/floors/$mallId',
-  getParentRoute: () => rootRouteImport,
+  id: '/floors/$mallId',
+  path: '/floors/$mallId',
+  getParentRoute: () => OwnerRoute,
 } as any)
 const OwnerDashboardMallIdRoute = OwnerDashboardMallIdRouteImport.update({
-  id: '/owner/dashboard/$mallId',
-  path: '/owner/dashboard/$mallId',
-  getParentRoute: () => rootRouteImport,
+  id: '/dashboard/$mallId',
+  path: '/dashboard/$mallId',
+  getParentRoute: () => OwnerRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/bookings': typeof BookingsRoute
   '/login': typeof LoginRoute
+  '/owner': typeof OwnerRouteWithChildren
   '/register': typeof RegisterRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/manage': typeof AdminManageRoute
@@ -106,8 +120,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/bookings': typeof BookingsRoute
   '/login': typeof LoginRoute
+  '/owner': typeof OwnerRouteWithChildren
   '/register': typeof RegisterRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/manage': typeof AdminManageRoute
@@ -122,8 +138,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/bookings': typeof BookingsRoute
   '/login': typeof LoginRoute
+  '/owner': typeof OwnerRouteWithChildren
   '/register': typeof RegisterRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/manage': typeof AdminManageRoute
@@ -139,8 +157,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/bookings'
     | '/login'
+    | '/owner'
     | '/register'
     | '/admin/dashboard'
     | '/admin/manage'
@@ -154,8 +174,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/bookings'
     | '/login'
+    | '/owner'
     | '/register'
     | '/admin/dashboard'
     | '/admin/manage'
@@ -169,8 +191,10 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/bookings'
     | '/login'
+    | '/owner'
     | '/register'
     | '/admin/dashboard'
     | '/admin/manage'
@@ -185,18 +209,13 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   BookingsRoute: typeof BookingsRoute
   LoginRoute: typeof LoginRoute
+  OwnerRoute: typeof OwnerRouteWithChildren
   RegisterRoute: typeof RegisterRoute
-  AdminDashboardRoute: typeof AdminDashboardRoute
-  AdminManageRoute: typeof AdminManageRoute
-  AdminPendingRoute: typeof AdminPendingRoute
   MallsMallIdRoute: typeof MallsMallIdRoute
-  OwnerMallsRoute: typeof OwnerMallsRoute
-  OwnerRegisterMallRoute: typeof OwnerRegisterMallRoute
   MallsIndexRoute: typeof MallsIndexRoute
-  OwnerDashboardMallIdRoute: typeof OwnerDashboardMallIdRoute
-  OwnerFloorsMallIdRoute: typeof OwnerFloorsMallIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -206,6 +225,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/owner': {
+      id: '/owner'
+      path: '/owner'
+      fullPath: '/owner'
+      preLoaderRoute: typeof OwnerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -220,6 +246,13 @@ declare module '@tanstack/react-router' {
       path: '/bookings'
       fullPath: '/bookings'
       preLoaderRoute: typeof BookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -238,17 +271,17 @@ declare module '@tanstack/react-router' {
     }
     '/owner/register-mall': {
       id: '/owner/register-mall'
-      path: '/owner/register-mall'
+      path: '/register-mall'
       fullPath: '/owner/register-mall'
       preLoaderRoute: typeof OwnerRegisterMallRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof OwnerRoute
     }
     '/owner/malls': {
       id: '/owner/malls'
-      path: '/owner/malls'
+      path: '/malls'
       fullPath: '/owner/malls'
       preLoaderRoute: typeof OwnerMallsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof OwnerRoute
     }
     '/malls/$mallId': {
       id: '/malls/$mallId'
@@ -259,56 +292,81 @@ declare module '@tanstack/react-router' {
     }
     '/admin/pending': {
       id: '/admin/pending'
-      path: '/admin/pending'
+      path: '/pending'
       fullPath: '/admin/pending'
       preLoaderRoute: typeof AdminPendingRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/manage': {
       id: '/admin/manage'
-      path: '/admin/manage'
+      path: '/manage'
       fullPath: '/admin/manage'
       preLoaderRoute: typeof AdminManageRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/dashboard': {
       id: '/admin/dashboard'
-      path: '/admin/dashboard'
+      path: '/dashboard'
       fullPath: '/admin/dashboard'
       preLoaderRoute: typeof AdminDashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/owner/floors/$mallId': {
       id: '/owner/floors/$mallId'
-      path: '/owner/floors/$mallId'
+      path: '/floors/$mallId'
       fullPath: '/owner/floors/$mallId'
       preLoaderRoute: typeof OwnerFloorsMallIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof OwnerRoute
     }
     '/owner/dashboard/$mallId': {
       id: '/owner/dashboard/$mallId'
-      path: '/owner/dashboard/$mallId'
+      path: '/dashboard/$mallId'
       fullPath: '/owner/dashboard/$mallId'
       preLoaderRoute: typeof OwnerDashboardMallIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof OwnerRoute
     }
   }
 }
 
-const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  BookingsRoute: BookingsRoute,
-  LoginRoute: LoginRoute,
-  RegisterRoute: RegisterRoute,
+interface AdminRouteChildren {
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminManageRoute: typeof AdminManageRoute
+  AdminPendingRoute: typeof AdminPendingRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
   AdminDashboardRoute: AdminDashboardRoute,
   AdminManageRoute: AdminManageRoute,
   AdminPendingRoute: AdminPendingRoute,
-  MallsMallIdRoute: MallsMallIdRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface OwnerRouteChildren {
+  OwnerMallsRoute: typeof OwnerMallsRoute
+  OwnerRegisterMallRoute: typeof OwnerRegisterMallRoute
+  OwnerDashboardMallIdRoute: typeof OwnerDashboardMallIdRoute
+  OwnerFloorsMallIdRoute: typeof OwnerFloorsMallIdRoute
+}
+
+const OwnerRouteChildren: OwnerRouteChildren = {
   OwnerMallsRoute: OwnerMallsRoute,
   OwnerRegisterMallRoute: OwnerRegisterMallRoute,
-  MallsIndexRoute: MallsIndexRoute,
   OwnerDashboardMallIdRoute: OwnerDashboardMallIdRoute,
   OwnerFloorsMallIdRoute: OwnerFloorsMallIdRoute,
+}
+
+const OwnerRouteWithChildren = OwnerRoute._addFileChildren(OwnerRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
+  BookingsRoute: BookingsRoute,
+  LoginRoute: LoginRoute,
+  OwnerRoute: OwnerRouteWithChildren,
+  RegisterRoute: RegisterRoute,
+  MallsMallIdRoute: MallsMallIdRoute,
+  MallsIndexRoute: MallsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -17,7 +17,7 @@ function MallsPage() {
   const fetchMalls = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get("/malls", { params: { search, city } });
+      const { data } = await api.get("/malls", { params: { name: search, address: city } });
       setMalls(data.malls ?? data ?? []);
     } catch {
       setMalls([]);
@@ -125,12 +125,12 @@ function MallsPage() {
                     <div className="flex items-center gap-2 text-sm">
                       <Bike className="h-4 w-4 text-[#0D0D0D]" />
                       <span className="text-[#2D2D2D]/60">Bike</span>
-                      <span className="font-semibold text-[#0D0D0D]">₹{m.bikeRatePerHour}/hr</span>
+                      <span className="font-semibold text-[#0D0D0D]">₹{m.pricing?.bike}/hr</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <Car className="h-4 w-4 text-[#0D0D0D]" />
                       <span className="text-[#2D2D2D]/60">Car</span>
-                      <span className="font-semibold text-[#0D0D0D]">₹{m.carRatePerHour}/hr</span>
+                      <span className="font-semibold text-[#0D0D0D]">₹{m.pricing?.car}/hr</span>
                     </div>
                   </div>
                 </Link>

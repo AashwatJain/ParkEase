@@ -8,6 +8,15 @@ const entry = asyncHandler(async (req, res) => {
   const { mallId, vehicleType, vehicleNumber } = req.body;
   const { id: userId } = req.user;
 
+  const existingBooking = await Booking.findOne({
+    user: userId,
+    status: "active",
+  });
+
+  if (existingBooking) {
+    throw new ApiError(409, "Complete older booking first");
+  }
+
   if (!mallId || !vehicleType || !vehicleNumber)
     throw new ApiError(400, "All fields are required");
 
@@ -34,6 +43,12 @@ const entry = asyncHandler(async (req, res) => {
     vehicleNumber,
   });
 
+  await booking.populate([
+    { path: "mall", select: "name city" },
+    { path: "floor", select: "floorNumber" },
+    { path: "slot", select: "slotNumber" },
+  ]);
+
   res.status(201).json(new ApiResponse(201, { booking }, "Booking done"));
 });
 
@@ -41,12 +56,18 @@ const exit = asyncHandler(async (req, res) => {
   const { bookingId } = req.params;
   const { id: userId } = req.user;
 
-  const booking = await Booking.findById(bookingId);
+  const booking = await Booking.findById(bookingId)
+    .populate("mall", "name city")
+    .populate("floor", "floorNumber")
+    .populate("slot", "slotNumber");
 
   if (!booking) throw new ApiError(404, "Booking not found");
 
   if (booking.user.toString() !== userId.toString())
     throw new ApiError(403, "Forbidden");
+
+  if (booking.status === "completed")
+    throw new ApiError(400, "Booking already completed");
 
   const fare = await booking.calculateFare(new Date());
   booking.status = "completed";
@@ -70,7 +91,10 @@ const getBooking = asyncHandler(async (req, res) => {
   const { bookingId } = req.params;
   const { id: userId } = req.user;
 
-  const booking = await Booking.findById(bookingId);
+  const booking = await Booking.findById(bookingId)
+    .populate("mall", "name city")
+    .populate("floor", "floorNumber")
+    .populate("slot", "slotNumber");
 
   if (!booking) throw new ApiError(404, "Booking not found");
 
@@ -88,11 +112,16 @@ const getBookings = asyncHandler(async (req, res) => {
   const bookings = await Booking.find({ user: userId })
     .sort({ createdAt: -1 })
     .skip((page - 1) * limit)
-    .limit(limit);
+    .limit(limit)
+    .populate("mall", "name city")
+    .populate("floor", "floorNumber")
+    .populate("slot", "slotNumber");
 
   res
     .status(200)
     .json(new ApiResponse(200, { bookings }, "Bookings retrieved"));
 });
 
-export { entry, exit, getBooking, getBookings };
+const verifyQr = asyncHandler(async (req, res) => {});
+
+export { entry, exit, getBooking, getBookings, verifyQr };

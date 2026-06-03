@@ -7,7 +7,7 @@ import {
 import { authorizeRoles } from "../middleware/role.middleware.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router.post("/", verifyJWT, authorizeRoles("mall-owner"), addFloor);
 router.get("/", getFloors);

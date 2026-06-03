@@ -17,7 +17,7 @@ export const Route = createFileRoute("/owner/register-mall")({
 const display = { fontFamily: "'Space Grotesk', ui-sans-serif, system-ui, sans-serif" };
 
 function RegisterMall() {
-  const [form, setForm] = useState({ name: "", address: "", city: "", bikeRatePerHour: 10, carRatePerHour: 30 });
+  const [form, setForm] = useState({ name: "", address: "", city: "", pricing: { bike: 10, car: 30 } });
   const [loading, setLoading] = useState(false);
   const nav = useNavigate();
 
@@ -60,8 +60,8 @@ function RegisterMall() {
             <Field label="Address" id="address" value={form.address} onChange={(v) => setForm({ ...form, address: v })} />
             <Field label="City" id="city" value={form.city} onChange={(v) => setForm({ ...form, city: v })} />
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Bike Rate (₹/hr)" id="bike" type="number" value={String(form.bikeRatePerHour)} onChange={(v) => setForm({ ...form, bikeRatePerHour: Number(v) })} />
-              <Field label="Car Rate (₹/hr)" id="car" type="number" value={String(form.carRatePerHour)} onChange={(v) => setForm({ ...form, carRatePerHour: Number(v) })} />
+              <Field label="Bike Rate (₹/hr)" id="bike" type="number" value={String(form.pricing.bike)} onChange={(v) => setForm({ ...form, pricing: { ...form.pricing, bike: Number(v) } })} />
+              <Field label="Car Rate (₹/hr)" id="car" type="number" value={String(form.pricing.car)} onChange={(v) => setForm({ ...form, pricing: { ...form.pricing, car: Number(v) } })} />
             </div>
           </div>
 

@@ -6,14 +6,14 @@ import { ApiResponse } from "../utils/ApiResponse.utils.js";
 
 const addFloor = asyncHandler(async (req, res) => {
   const { mallId } = req.params;
-  const { floorNumber, bikeSlots, carSlots } = req.body;
+  let { floorNumber, bikeSlots, carSlots } = req.body;
 
   floorNumber = parseInt(floorNumber);
   bikeSlots = parseInt(bikeSlots);
   carSlots = parseInt(carSlots);
 
   if (!floorNumber || !bikeSlots || !carSlots)
-    throw new ApiErrorError(400, "All fields are necessary");
+    throw new ApiError(400, "All fields are necessary");
 
   const floor = await Floor.create({
     mall: mallId,
@@ -28,7 +28,7 @@ const addFloor = asyncHandler(async (req, res) => {
     slotsArr.push({
       mall: mallId,
       floor: floor._id,
-      slotNumber: `${floorNumber}-B${bikeSlots}`,
+      slotNumber: `${floorNumber}-B${i}`,
       vehicleType: "bike",
       status: "available",
     });
@@ -37,7 +37,7 @@ const addFloor = asyncHandler(async (req, res) => {
     slotsArr.push({
       mall: mallId,
       floor: floor._id,
-      slotNumber: `${floorNumber}-B${carSlots}`,
+      slotNumber: `${floorNumber}-C${i}`,
       vehicleType: "car",
       status: "available",
     });

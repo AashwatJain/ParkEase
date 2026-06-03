@@ -38,8 +38,8 @@ function MyBookings() {
 
   const exit = async (id: string) => {
     try {
-      const { data } = await api.post(`/bookings/exit/${id}`);
-      toast.success(`Paid ₹${data.amount ?? data.booking?.amount ?? "—"}. Drive safe!`);
+      const { data } = await api.patch(`/bookings/exit/${id}`);
+      toast.success(`Paid ₹${data.fare ?? data.booking?.fare ?? "—"}. Drive safe!`);
       fetchBookings();
     } catch (err: any) {
       toast.error(err?.response?.data?.message || "Exit failed");
@@ -74,7 +74,9 @@ function MyBookings() {
         ) : (
           <div className="grid gap-5 lg:grid-cols-2">
             {bookings.map((b, i) => {
-              const mall = typeof b.mall === "object" ? b.mall : null;
+              const mall = (typeof b.mall === "object" && b.mall !== null) ? b.mall as any : null;
+              const slotObj = (typeof b.slot === "object" && b.slot !== null) ? b.slot as any : null;
+              const floorObj = (typeof b.floor === "object" && b.floor !== null) ? b.floor as any : null;
               const active = b.status === "active";
               return (
                 <motion.div
@@ -87,11 +89,11 @@ function MyBookings() {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <h3 style={display} className="text-lg font-bold tracking-tight text-[#0D0D0D]">
-                        {mall?.name || b.mallName || "Mall"}
+                        {mall?.name || b.mall?.name || "Mall"}
                       </h3>
-                      {mall?.city && (
+                      {(mall?.city || b.mall?.city) && (
                         <div className="mt-1 flex items-center gap-1.5 text-sm text-[#2D2D2D]/70">
-                          <MapPin className="h-3.5 w-3.5" /> {mall.city}
+                          <MapPin className="h-3.5 w-3.5" /> {mall?.city || b.mall?.city}
                         </div>
                       )}
                     </div>
@@ -105,7 +107,7 @@ function MyBookings() {
 
                   <div className="mt-5 grid grid-cols-2 gap-4 border-t border-black/10 pt-4 text-sm">
                     <Info label="Vehicle" value={`${b.vehicleType.toUpperCase()} · ${b.vehicleNumber}`} icon={b.vehicleType === "bike" ? Bike : Car} />
-                    <Info label="Slot" value={b.slotNumber ? `F${b.floorNumber ?? "-"} · ${b.slotNumber}` : "—"} />
+                    <Info label="Slot" value={slotObj?.slotNumber ? `F${floorObj?.floorNumber ?? "-"} · ${slotObj.slotNumber}` : "—"} />
                     <Info label="Entry" value={new Date(b.entryTime).toLocaleString()} icon={Clock} />
                     {b.exitTime && <Info label="Exit" value={new Date(b.exitTime).toLocaleString()} icon={Clock} />}
                   </div>
@@ -128,10 +130,10 @@ function MyBookings() {
                     >
                       Exit & Pay
                     </button>
-                  ) : b.amount != null ? (
+                  ) : b.fare ? (
                     <div className="mt-5 flex items-center justify-between border-t border-black/10 pt-4">
                       <span style={display} className="text-[10px] font-bold uppercase tracking-widest text-[#2D2D2D]/60">Total paid</span>
-                      <span style={display} className="text-xl font-bold text-[#0D0D0D]">₹{b.amount}</span>
+                      <span style={display} className="text-xl font-bold text-[#0D0D0D]">₹{b.fare}</span>
                     </div>
                   ) : null}
 

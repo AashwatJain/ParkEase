@@ -83,8 +83,8 @@ function OwnerMalls() {
                   <MapPin className="h-3.5 w-3.5" /> {m.city}
                 </div>
                 <div className="mt-5 flex gap-4 border-t border-black/10 pt-4 text-sm text-[#2D2D2D]">
-                  <span><Bike className="mr-1 inline h-3.5 w-3.5 text-[#0D0D0D]" />₹{m.bikeRatePerHour}/hr</span>
-                  <span><Car className="mr-1 inline h-3.5 w-3.5 text-[#0D0D0D]" />₹{m.carRatePerHour}/hr</span>
+                  <span><Bike className="mr-1 inline h-3.5 w-3.5 text-[#0D0D0D]" />₹{m.pricing?.bike}/hr</span>
+                  <span><Car className="mr-1 inline h-3.5 w-3.5 text-[#0D0D0D]" />₹{m.pricing?.car}/hr</span>
                 </div>
                 {m.status === "rejected" && m.rejectionReason && (
                   <p className="mt-3 rounded-lg border border-black/10 bg-[#F5F3EE] p-3 text-xs text-[#2D2D2D]">{m.rejectionReason}</p>
