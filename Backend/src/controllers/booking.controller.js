@@ -122,6 +122,44 @@ const getBookings = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, { bookings }, "Bookings retrieved"));
 });
 
-const verifyQr = asyncHandler(async (req, res) => {});
+const verifyQr = asyncHandler(async (req, res) => {
+  const { bookingId } = req.body;
+  const ownerId = req.user.id;
+
+  if (!bookingId) {
+    throw new ApiError(400, "Booking ID is required from QR payload");
+  }
+
+  const booking = await Booking.findById(bookingId)
+    .populate("mall")
+    .populate("floor", "floorNumber")
+    .populate("slot", "slotNumber");
+
+  if (!booking) {
+    throw new ApiError(404, "Invalid QR: Booking not found");
+  }
+
+  if (!booking.mall.owner.equals(ownerId) && req.user.role !== "admin") {
+    throw new ApiError(403, "Forbidden: You cannot scan QRs for other malls");
+  }
+
+  if (booking.status === "completed") {
+    throw new ApiError(400, "QR Expired: This booking is already completed");
+  }
+
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        vehicleNumber: booking.vehicleNumber,
+        vehicleType: booking.vehicleType,
+        slot: booking.slot.slotNumber,
+        floor: booking.floor.floorNumber,
+        status: booking.status,
+      },
+      "QR Verified Successfully"
+    )
+  );
+});
 
 export { entry, exit, getBooking, getBookings, verifyQr };

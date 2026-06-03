@@ -6,6 +6,7 @@ import {
   exit,
   getBooking,
   getBookings,
+  verifyQr,
 } from "../controllers/booking.controller.js";
 
 const router = express.Router();
@@ -17,5 +18,6 @@ router.post("/entry", entry);
 router.patch("/exit/:bookingId", exit);
 router.get("/my", getBookings);
 router.get("/:bookingId", getBooking);
+router.post("/verify-qr", authorizeRoles("mall-owner", "admin"), verifyQr);
 
 export default router;

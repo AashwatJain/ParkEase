@@ -113,7 +113,7 @@ const deleteMall = asyncHandler(async (req, res) => {
   if (!mall) throw new ApiError(404, "Mall not found");
 
   if (!mall.owner.equals(ownerId) && req.user.role !== "admin")
-    throw new ApiError(403, "You are not autorised to do this");
+    throw new ApiError(403, "You are not Authorised to do this");
 
   mall.isActive = false;
 
