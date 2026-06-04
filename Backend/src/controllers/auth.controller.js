@@ -3,6 +3,8 @@ import { ApiError } from "../utils/ApiError.utils.js";
 import { asyncHandler } from "../utils/asyncHandler.utils.js";
 import { ApiResponse } from "../utils/ApiResponse.utils.js";
 
+const cookieOptions = { httpOnly: true, secure: true, sameSite: "none" };
+
 const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password, role = "user" } = req.body;
 
@@ -30,7 +32,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   res
     .status(201)
-    .cookie("token", token, { httpOnly: true, secure: true })
+    .cookie("token", token, cookieOptions)
     .json(new ApiResponse(201, { user }, "User created"));
 });
 
@@ -65,12 +67,12 @@ const loginUser = asyncHandler(async (req, res) => {
 
   res
     .status(200)
-    .cookie("token", token, { httpOnly: true, secure: true })
+    .cookie("token", token, cookieOptions)
     .json(new ApiResponse(200, { user }, "User logged In"));
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
-  res.clearCookie("token", { httpOnly: true, secure: true });
+  res.clearCookie("token", cookieOptions);
   res.status(200).json(new ApiResponse(200, {}, "User logged Out"));
 });
 
