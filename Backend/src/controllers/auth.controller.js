@@ -57,6 +57,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
   if (!isPassValid) throw new ApiError(401, "Invalid Credentials");
 
+  if (user.isBanned) throw new ApiError(403, "Your account has been banned. Please contact admin.");
+
   const token = user.generateToken();
 
   user.password = undefined;

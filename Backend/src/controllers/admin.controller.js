@@ -159,6 +159,11 @@ const unban = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, {}, "User Unbanned"));
 });
 
+const getAllUsers = asyncHandler(async (req, res) => {
+  const users = await User.find({ role: { $ne: "admin" } });
+  res.status(200).json(new ApiResponse(200, users, "Users fetched successfully"));
+});
+
 export {
   getPendingMalls,
   approveMalls,
@@ -167,4 +172,5 @@ export {
   allMalls,
   ban,
   unban,
+  getAllUsers,
 };

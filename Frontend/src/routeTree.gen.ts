@@ -19,6 +19,7 @@ import { Route as MallsIndexRouteImport } from './routes/malls/index'
 import { Route as OwnerRegisterMallRouteImport } from './routes/owner/register-mall'
 import { Route as OwnerMallsRouteImport } from './routes/owner/malls'
 import { Route as MallsMallIdRouteImport } from './routes/malls/$mallId'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminPendingRouteImport } from './routes/admin/pending'
 import { Route as AdminManageRouteImport } from './routes/admin/manage'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
@@ -75,6 +76,11 @@ const MallsMallIdRoute = MallsMallIdRouteImport.update({
   path: '/malls/$mallId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPendingRoute = AdminPendingRouteImport.update({
   id: '/pending',
   path: '/pending',
@@ -111,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/manage': typeof AdminManageRoute
   '/admin/pending': typeof AdminPendingRoute
+  '/admin/users': typeof AdminUsersRoute
   '/malls/$mallId': typeof MallsMallIdRoute
   '/owner/malls': typeof OwnerMallsRoute
   '/owner/register-mall': typeof OwnerRegisterMallRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/manage': typeof AdminManageRoute
   '/admin/pending': typeof AdminPendingRoute
+  '/admin/users': typeof AdminUsersRoute
   '/malls/$mallId': typeof MallsMallIdRoute
   '/owner/malls': typeof OwnerMallsRoute
   '/owner/register-mall': typeof OwnerRegisterMallRoute
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/manage': typeof AdminManageRoute
   '/admin/pending': typeof AdminPendingRoute
+  '/admin/users': typeof AdminUsersRoute
   '/malls/$mallId': typeof MallsMallIdRoute
   '/owner/malls': typeof OwnerMallsRoute
   '/owner/register-mall': typeof OwnerRegisterMallRoute
@@ -165,6 +174,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/manage'
     | '/admin/pending'
+    | '/admin/users'
     | '/malls/$mallId'
     | '/owner/malls'
     | '/owner/register-mall'
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/manage'
     | '/admin/pending'
+    | '/admin/users'
     | '/malls/$mallId'
     | '/owner/malls'
     | '/owner/register-mall'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/manage'
     | '/admin/pending'
+    | '/admin/users'
     | '/malls/$mallId'
     | '/owner/malls'
     | '/owner/register-mall'
@@ -290,6 +302,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MallsMallIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/pending': {
       id: '/admin/pending'
       path: '/pending'
@@ -332,12 +351,14 @@ interface AdminRouteChildren {
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminManageRoute: typeof AdminManageRoute
   AdminPendingRoute: typeof AdminPendingRoute
+  AdminUsersRoute: typeof AdminUsersRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminDashboardRoute: AdminDashboardRoute,
   AdminManageRoute: AdminManageRoute,
   AdminPendingRoute: AdminPendingRoute,
+  AdminUsersRoute: AdminUsersRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)

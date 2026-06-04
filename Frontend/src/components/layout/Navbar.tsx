@@ -39,6 +39,7 @@ export function Navbar() {
               <NavLink to="/admin/dashboard">Dashboard</NavLink>
               <NavLink to="/admin/pending">Pending Approvals</NavLink>
               <NavLink to="/admin/manage">Manage Malls</NavLink>
+              <NavLink to="/admin/users">Manage Users</NavLink>
             </>
           )}
         </nav>

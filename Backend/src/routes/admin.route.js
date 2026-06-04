@@ -9,6 +9,7 @@ import {
   allMalls,
   ban,
   unban,
+  getAllUsers,
 } from "../controllers/admin.controller.js";
 
 const router = express.Router();
@@ -21,6 +22,7 @@ router.patch("/malls/:mallId/reject", rejectMalls);
 router.get("/platform-stats", getstats);
 
 router.get("/all-malls", allMalls);
+router.get("/users", getAllUsers);
 router.patch("/ban/:userId", ban);
 router.patch("/unban/:userId", unban);
 
