@@ -1,18 +1,25 @@
-import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { defineConfig } from "vite";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import tsconfigPaths from "vite-tsconfig-paths";
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  nitro: true,
-  tanstackStart: {
-    server: { entry: "server" },
-  },
-  vite: {
-    server: {
-      proxy: {
-        "/api": {
-          target: "http://localhost:8000",
-          changeOrigin: true,
-          cookieDomainRewrite: "",
-        },
+  plugins: [
+    tailwindcss(),
+    tsconfigPaths(),
+    tanstackStart({
+      server: {
+        entry: "server",
+        preset: "vercel"
+      },
+    }),
+  ],
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+        cookieDomainRewrite: "",
       },
     },
   },
