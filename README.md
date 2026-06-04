@@ -6,7 +6,7 @@ A full-stack mall parking platform with real-time slot availability, QR-based en
 
 | | URL |
 |---|---|
-| **Frontend** | [https://park-ease-git-main-aashwatjains-projects.vercel.app](https://park-ease-git-main-aashwatjains-projects.vercel.app) |
+| **Frontend** | [https://park-ease-two.vercel.app](https://park-ease-two.vercel.app) |
 | **Backend API** | [https://parkease-pe0d.onrender.com/api](https://parkease-pe0d.onrender.com/api) |
 
 > ⚠️ Backend is hosted on Render free tier — first request may take ~30s to wake up.
