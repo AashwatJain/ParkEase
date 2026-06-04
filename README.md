@@ -2,6 +2,8 @@
 
 A full-stack mall parking platform with real-time slot availability, QR-based entry/exit, duration-based billing, and multi-role access control.
 
+> 📄 For detailed problem statement, schemas, and API design — see [PROBLEM_STATEMENT.md](Backend/PROBLEM_STATEMENT.md)
+
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=node.js&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-000000?style=flat&logo=express&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat&logo=mongodb&logoColor=white)
