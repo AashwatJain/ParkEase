@@ -13,6 +13,12 @@ const rate = asyncHandler(async (req, res) => {
 
   if (!booking) throw new ApiError(404, "Booking not found");
 
+  if (booking.user.toString() !== req.user.id.toString())
+    throw new ApiError(403, "You can only rate your own bookings");
+
+  if (booking.status !== "completed")
+    throw new ApiError(400, "Complete your booking before rating");
+
   const rating = await Rating.create({
     user: req.user.id,
     mall: booking.mall,

@@ -24,10 +24,8 @@ const multipleSlotMaintenance = asyncHandler(async (req, res) => {
   const { floorId } = req.params;
 
   const result = await Slot.updateMany(
-    { floor: floorId },
-    {
-      status: "maintenance",
-    },
+    { floor: floorId, status: "maintenance" },
+    { status: "available" },
   );
 
   res

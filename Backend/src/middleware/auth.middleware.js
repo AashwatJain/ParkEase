@@ -5,7 +5,6 @@ import { User } from "../models/user.model.js";
 
 const verifyJWT = asyncHandler(async (req, res, next) => {
   const { token } = req.cookies;
-  console.log(token);
   if (!token) throw new ApiError(401, "Unauthorized request. No token found");
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -22,7 +21,7 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
 
     next();
   } catch (error) {
-    throw new ApiError(401, "Invalid Token");
+    throw new ApiError(401, "Invalid Token or user is banned");
   }
 });
 

@@ -17,13 +17,13 @@ A full-stack mall parking platform with real-time slot availability, QR-based en
 | 🔐 **Multi-Role Auth** | User, Mall Owner, Super Admin — JWT + HTTP-only cookies |
 | 🏢 **Mall Registration** | Owner registers → Admin approves/rejects with reason |
 | 🅿️ **Auto Slot Allotment** | Atomic `findOneAndUpdate` — zero double bookings |
-| 📱 **QR Code Entry/Exit** | QR generated at entry, scanned at exit for verification |
+| 📱 **QR Code System** | QR generated at entry, verified by guard/owner at gate |
 | 💰 **Duration Billing** | `ceil(hours) × rate` — pay only for time parked |
-| 📊 **Owner Dashboard** | Real-time stats, peak hours, revenue analytics (aggregation) |
-| ⭐ **Rating System** | 1-5 stars + feedback after completed booking |
+| 📊 **Owner Dashboard** | Grand total stats + per-mall breakdown (slots, revenue) |
+| ⭐ **Rating System** | 1-5 stars + feedback after completed booking (ownership + completion enforced) |
 | 🛡️ **Admin Panel** | Platform stats, approve/reject malls, ban/unban users |
-| ⏰ **Auto-Expire** | Cron job frees stale bookings (24hr+) |
-| 🚦 **Rate Limiting** | API abuse protection on all endpoints |
+| 🚫 **Ban System** | Banned users blocked on every authenticated request via middleware |
+| 🔒 **One Active Booking** | User can only have 1 active booking at a time |
 
 ---
 
@@ -33,12 +33,12 @@ A full-stack mall parking platform with real-time slot availability, QR-based en
 mall-parking-system/
 ├── Backend/          # Express.js REST API
 │   ├── src/
-│   │   ├── controllers/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   ├── middleware/
-│   │   ├── utils/
-│   │   └── db/
+│   │   ├── controllers/    # Business logic (8 controllers)
+│   │   ├── models/         # Mongoose schemas (6 models)
+│   │   ├── routes/         # API route definitions (8 routers)
+│   │   ├── middleware/     # Auth, RBAC, error handling (4 middlewares)
+│   │   ├── utils/          # ApiError, ApiResponse, asyncHandler, QR
+│   │   └── db/             # MongoDB connection
 │   ├── server.js
 │   └── package.json
 │
@@ -65,9 +65,8 @@ mall-parking-system/
 | Database | MongoDB + Mongoose |
 | Auth | JWT + bcryptjs + cookie-parser |
 | QR Code | qrcode |
-| Email | Nodemailer |
-| Cron | node-cron |
-| Rate Limit | express-rate-limit |
+| CORS | cors |
+| Env Config | dotenv |
 
 ### Frontend (Vibecoded 🎨)
 | Layer | Technology |
@@ -141,7 +140,7 @@ CORS_ORIGIN=*
 ### Auth — `/api/auth`
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/register` | Register user/mall-owner |
+| POST | `/register` | Register user/mall-owner (admin role blocked) |
 | POST | `/login` | Login → JWT cookie |
 | POST | `/logout` | Clear cookie |
 | GET | `/profile` | Get current user |
@@ -149,25 +148,48 @@ CORS_ORIGIN=*
 ### Malls — `/api/malls`
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/` | Register mall (owner) |
-| GET | `/` | Browse approved malls (search, city filter, pagination) |
+| POST | `/` | Register mall → pending status (owner) |
+| GET | `/` | Browse approved & active malls (search by name/address, paginated) |
 | GET | `/:mallId` | Mall detail + avg rating |
-| PATCH | `/:mallId` | Update mall (owner/admin) |
-| DELETE | `/:mallId` | Delete mall (owner/admin) |
+| PATCH | `/:mallId` | Update mall — resets status to pending (owner/admin) |
+| DELETE | `/:mallId` | Soft delete mall — isActive → false (owner/admin) |
 
 ### Floors — `/api/malls/:mallId/floors`
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/` | Add floor (auto-generates slots) |
+| POST | `/` | Add floor (auto-generates bike + car slots) |
 | GET | `/` | Get all floors |
-| GET | `/:floorId/availability` | Floor-wise slot availability |
+| GET | `/:floorId/availability` | Floor-wise available slot count (bike/car) |
+
+### Slots — `/api/slots`
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| PATCH | `/:slotId/maintenance` | Single slot → maintenance (owner/admin) |
+| PATCH | `/floor/:floorId/maintenance` | Bulk: entire floor → maintenance (owner/admin) |
+| PATCH | `/floor/:floorId/activate` | Bulk: maintenance slots → available (owner/admin) |
 
 ### Bookings — `/api/bookings`
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/entry` | Park vehicle → auto-allot slot → QR code |
-| POST | `/exit/:bookingId` | Exit → calculate bill → free slot |
-| GET | `/my` | User's booking history |
+| POST | `/entry` | Park vehicle → auto-allot slot → QR code generated |
+| PATCH | `/exit/:bookingId` | Exit → calculate fare → free slot |
+| POST | `/verify-qr` | Guard: verify QR validity + mall ownership (owner/admin) |
+| GET | `/my` | User's booking history (paginated) |
+| GET | `/:bookingId` | Single booking detail |
+
+### Ratings — `/api/ratings`
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/:bookingId` | Rate completed booking (ownership + completion enforced) |
+| GET | `/mall/:mallId` | Get all ratings for a mall (paginated) |
+
+### Mall Owner Dashboard — `/api/owner`
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/malls` | Owner's registered malls |
+| GET | `/dashboard` | Grand total: all malls combined — slots, today's revenue |
+| GET | `/mall-stats` | Per-mall breakdown: available, occupied, total revenue |
+| GET | `/ratings/:mallId` | Per-mall rating distribution (1-5 star counts) |
 
 ### Admin — `/api/admin`
 | Method | Endpoint | Description |
@@ -175,17 +197,10 @@ CORS_ORIGIN=*
 | GET | `/malls/pending` | Pending malls list |
 | PATCH | `/malls/:mallId/approve` | Approve mall |
 | PATCH | `/malls/:mallId/reject` | Reject mall (with reason) |
-| GET | `/platform-stats` | Total users, malls, bookings, revenue |
+| GET | `/platform-stats` | Total users, malls, bookings, revenue (aggregation) |
+| GET | `/all-malls` | All malls with live stats (occupied, available, today revenue) |
 | PATCH | `/ban/:userId` | Ban user |
 | PATCH | `/unban/:userId` | Unban user |
-
-### Mall Owner Dashboard — `/api/owner`
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| GET | `/dashboard/:mallId` | Real-time: occupied, available, today's revenue | ✅ Owner / Admin |
-| GET | `/analytics/:mallId` | Peak hours, busiest floor, avg duration | ✅ Owner / Admin |
-| GET | `/revenue/:mallId` | Revenue: daily / weekly / monthly breakdown | ✅ Owner / Admin |
-| GET | `/ratings/:mallId` | Avg rating, total reviews, rating distribution | ✅ Owner / Admin |
 
 ---
 
@@ -193,10 +208,12 @@ CORS_ORIGIN=*
 
 ```
 User arrives → Selects vehicle type → Enters vehicle number
-    → System auto-allots slot (atomic) → QR code generated
+    → Active booking check (max 1) → Slot auto-allotted (atomic)
+    → QR code generated → Booking created
     → User parks...
-    → QR scanned at exit → Duration calculated → Bill generated
-    → Slot freed → User can rate experience ⭐
+    → User hits exit → Ownership verified → Duration calculated
+    → Bill generated → Slot freed → Booking completed
+    → User can rate experience ⭐
 ```
 
 ---
@@ -205,9 +222,26 @@ User arrives → Selects vehicle type → Enters vehicle number
 
 | Role | Access |
 |------|--------|
-| **User** | Browse malls, book parking, exit & pay, rate |
-| **Mall Owner** | Register mall, manage floors/slots, view dashboard & analytics |
-| **Super Admin** | Approve/reject malls, ban users, platform-wide stats |
+| **User** | Browse malls, book parking, exit & pay, rate completed bookings |
+| **Mall Owner** | Register mall, manage floors/slots, dashboard stats, QR verify, view ratings |
+| **Super Admin** | Approve/reject malls, ban/unban users, platform-wide stats, all malls overview |
+
+---
+
+## 🧠 Key Engineering Highlights
+
+| Concept | Implementation |
+|---|---|
+| **Atomic Operations** | `findOneAndUpdate` for slot allotment — zero race conditions |
+| **MongoDB Aggregation** | Dashboard stats, platform stats, revenue calculation |
+| **Promise.all** | Parallel DB queries in dashboard/stats for performance |
+| **Compound Indexing** | Fast slot queries (`mall + floor + vehicleType + status`) |
+| **Unique Indexing** | One rating per booking enforced at DB level |
+| **Pre-validate Hooks** | Auto QR generation + entry time on booking creation |
+| **Post-save Hooks** | Auto avg rating recalculation on new rating |
+| **Role-based Auth** | 3 roles with granular route-level access control |
+| **Soft Delete** | Mall deletion via `isActive` flag |
+| **Status Workflows** | Mall: pending → approved/rejected, Booking: active → completed |
 
 ---
 

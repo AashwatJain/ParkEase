@@ -4,8 +4,7 @@ import { verifyJWT } from "../middleware/auth.middleware.js";
 import {
   getOwnerMalls,
   getOwnerDashboardStats,
-  getOwnerAnalytics,
-  getOwnerRevenue,
+  getMallWiseStats,
   getOwnerRatings,
 } from "../controllers/owner.controller.js";
 
@@ -14,9 +13,8 @@ const router = express.Router();
 router.use(verifyJWT, authorizeRoles("mall-owner", "admin"));
 
 router.get("/malls", getOwnerMalls);
-router.get("/dashboard/:mallId", getOwnerDashboardStats);
-router.get("/analytics/:mallId", getOwnerAnalytics);
-router.get("/revenue/:mallId", getOwnerRevenue);
+router.get("/dashboard", getOwnerDashboardStats);
+router.get("/mall-stats", getMallWiseStats);
 router.get("/ratings/:mallId", getOwnerRatings);
 
 export default router;
