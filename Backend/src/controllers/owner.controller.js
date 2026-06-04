@@ -27,13 +27,14 @@ const getOwnerDashboardStats = asyncHandler(async (req, res) => {
   let totalMalls = malls.length,
     availableSlots = 0,
     occupiedSlots = 0,
-    todaysRevenue = 0;
+    todaysRevenue = 0,
+    totalRevenue = 0;
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   for (const mall of malls) {
-    const [ava, occ, rev] = await Promise.all([
+    const [ava, occ, revToday, revTotal] = await Promise.all([
       Slot.countDocuments({ mall: mall._id, status: "available" }),
       Slot.countDocuments({ mall: mall._id, status: "occupied" }),
       Booking.aggregate([
@@ -51,12 +52,27 @@ const getOwnerDashboardStats = asyncHandler(async (req, res) => {
           },
         },
       ]),
+      Booking.aggregate([
+        {
+          $match: {
+            mall: mall._id,
+            status: "completed",
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalRevenue: { $sum: "$fare" },
+          },
+        },
+      ]),
     ]);
 
     availableSlots += ava;
     occupiedSlots += occ;
 
-    todaysRevenue += rev.length ? rev[0].todayRevenue : 0;
+    todaysRevenue += revToday.length ? revToday[0].todayRevenue : 0;
+    totalRevenue += revTotal.length ? revTotal[0].totalRevenue : 0;
   }
 
   res
@@ -64,7 +80,7 @@ const getOwnerDashboardStats = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        { totalMalls, availableSlots, occupiedSlots, todaysRevenue },
+        { totalMalls, availableSlots, occupiedSlots, todaysRevenue, totalRevenue },
         "Request successfull",
       ),
     );
@@ -77,12 +93,30 @@ const getMallWiseStats = asyncHandler(async (req, res) => {
     owner: id,
   });
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   let data = [];
 
   for (const mall of malls) {
-    const [ava, occ, rev] = await Promise.all([
+    const [ava, occ, revToday, revTotal] = await Promise.all([
       Slot.countDocuments({ mall: mall._id, status: "available" }),
       Slot.countDocuments({ mall: mall._id, status: "occupied" }),
+      Booking.aggregate([
+        {
+          $match: {
+            mall: mall._id,
+            status: "completed",
+            exitTime: { $gte: today },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            todayRevenue: { $sum: "$fare" },
+          },
+        },
+      ]),
       Booking.aggregate([
         {
           $match: {
@@ -93,17 +127,19 @@ const getMallWiseStats = asyncHandler(async (req, res) => {
         {
           $group: {
             _id: null,
-            todayRevenue: { $sum: "$fare" },
+            totalRevenue: { $sum: "$fare" },
           },
         },
       ]),
     ]);
 
     data.push({
+      mallId: mall._id,
       mallName: mall.name,
       slotsAvailable: ava,
       slotsOccupied: occ,
-      revenue: rev.length ? rev[0].todayRevenue : 0,
+      revenue: revToday.length ? revToday[0].todayRevenue : 0,
+      totalRevenue: revTotal.length ? revTotal[0].totalRevenue : 0,
     });
   }
 

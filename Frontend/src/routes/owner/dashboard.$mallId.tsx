@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { api } from "@/lib/api/client";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { LayoutGrid, Car, CheckCircle, Layers } from "lucide-react";
+import { LayoutGrid, Car, CheckCircle, Layers, IndianRupee } from "lucide-react";
 
 export const Route = createFileRoute("/owner/dashboard/$mallId")({
   component: () => (
@@ -20,10 +20,11 @@ function Dashboard() {
   const { mallId } = Route.useParams();
   const [mallName, setMallName] = useState("");
   const [stats, setStats] = useState({
-    totalSlots: 0,
-    totalFloors: 0,
-    bikeSlots: 0,
-    carSlots: 0,
+    available: 0,
+    occupied: 0,
+    total: 0,
+    revenue: 0,
+    totalRevenue: 0,
   });
 
   useEffect(() => {
@@ -34,32 +35,29 @@ function Dashboard() {
         const mallData = mallRes.data.mall ?? mallRes.data;
         setMallName(mallData?.name ?? "Mall");
 
-        // Fetch floors to calculate slot stats
-        const floorsRes = await api.get(`/malls/${mallId}/floors`);
-        const floors = floorsRes.data.floors ?? floorsRes.data ?? [];
+        // Fetch live stats
+        const statsRes = await api.get("/owner/mall-stats");
+        const allStats = statsRes.data.data ?? statsRes.data ?? [];
+        const mallStats = allStats.find((s: any) => s.mallId === mallId);
 
-        let bikeSlots = 0;
-        let carSlots = 0;
-        for (const f of floors) {
-          bikeSlots += f.bikeSlots ?? 0;
-          carSlots += f.carSlots ?? 0;
+        if (mallStats) {
+          setStats({
+            available: mallStats.slotsAvailable || 0,
+            occupied: mallStats.slotsOccupied || 0,
+            total: (mallStats.slotsAvailable || 0) + (mallStats.slotsOccupied || 0),
+            revenue: mallStats.revenue || 0,
+            totalRevenue: mallStats.totalRevenue || 0,
+          });
         }
-
-        setStats({
-          totalSlots: bikeSlots + carSlots,
-          totalFloors: floors.length,
-          bikeSlots,
-          carSlots,
-        });
       } catch {}
     })();
   }, [mallId]);
 
   const cards = [
-    { label: "Total Floors", value: stats.totalFloors, Icon: Layers },
-    { label: "Total Slots", value: stats.totalSlots, Icon: LayoutGrid },
-    { label: "Bike Slots", value: stats.bikeSlots, Icon: Car },
-    { label: "Car Slots", value: stats.carSlots, Icon: CheckCircle, accent: true },
+    { label: "Available Slots", value: stats.available, Icon: LayoutGrid },
+    { label: "Occupied Slots", value: stats.occupied, Icon: Car },
+    { label: "Today's Revenue", value: `₹${stats.revenue}`, Icon: IndianRupee, accent: true },
+    { label: "Total Revenue", value: `₹${stats.totalRevenue}`, Icon: Layers },
   ];
 
   return (

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { api, type Booking } from "@/lib/api/client";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { Loader } from "@/components/ui/Loader";
 import { Bike, Car, Clock, MapPin, Star } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -22,11 +23,37 @@ function MyBookings() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [ratedBookings, setRatedBookings] = useState<string[]>(() => {
+    return JSON.parse(localStorage.getItem("ratedBookings") || "[]");
+  });
+  const [feedbackInputs, setFeedbackInputs] = useState<Record<string, string>>({});
+  const [submittedReviews, setSubmittedReviews] = useState<Record<string, any>>({});
+
   const fetchBookings = async () => {
     setLoading(true);
     try {
       const { data } = await api.get("/bookings/my");
-      setBookings(data.bookings ?? data ?? []);
+      const fetchedBookings = data.bookings ?? data ?? [];
+      setBookings(fetchedBookings);
+
+      // Frontend-only hack to get past reviews without touching backend
+      const mallIds = [...new Set(fetchedBookings.map((b: any) => 
+        (typeof b.mall === "object" && b.mall !== null) ? b.mall._id : b.mall
+      ).filter(Boolean))];
+
+      const reviewsMap: Record<string, any> = {};
+      await Promise.all(
+        mallIds.map(async (mallId) => {
+          try {
+            const res = await api.get(`/ratings/mall/${mallId}?limit=100`);
+            const ratings = res.data?.ratings ?? res.data?.data?.ratings ?? [];
+            ratings.forEach((r: any) => {
+              if (r.booking) reviewsMap[r.booking] = r;
+            });
+          } catch (e) {}
+        })
+      );
+      setSubmittedReviews(reviewsMap);
     } catch {
       setBookings([]);
     } finally {
@@ -48,11 +75,23 @@ function MyBookings() {
 
   const rate = async (id: string, rating: number) => {
     try {
-      await api.post(`/ratings/${id}`, { rating, feedback: "" });
+      const feedback = feedbackInputs[id] || "";
+      await api.post(`/ratings/${id}`, { rate: rating, feedback: feedback || "Great!" });
+      const newRated = [...ratedBookings, id];
+      setRatedBookings(newRated);
+      localStorage.setItem("ratedBookings", JSON.stringify(newRated));
+      setSubmittedReviews(prev => ({ ...prev, [id]: { rating, feedback } }));
       toast.success("Thanks for the rating!");
-      fetchBookings();
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Rating failed");
+      const errMsg = err?.response?.data?.message || err?.message || "";
+      if (errMsg.includes("duplicate") || errMsg.includes("E11000") || errMsg.includes("already")) {
+        const newRated = [...ratedBookings, id];
+        setRatedBookings(newRated);
+        localStorage.setItem("ratedBookings", JSON.stringify(newRated));
+        toast.info("You had already rated this! Hiding stars.");
+      } else {
+        toast.error(errMsg || "Rating failed");
+      }
     }
   };
 
@@ -68,7 +107,7 @@ function MyBookings() {
 
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         {loading ? (
-          <p className="text-center text-sm text-[#2D2D2D]/60">Loading...</p>
+          <Loader text="Loading Bookings" />
         ) : bookings.length === 0 ? (
           <p className="py-20 text-center text-sm text-[#2D2D2D]/60">No bookings yet.</p>
         ) : (
@@ -137,14 +176,48 @@ function MyBookings() {
                     </div>
                   ) : null}
 
-                  {!active && !b.rated && (
-                    <div className="mt-4 flex items-center gap-1">
-                      <span style={display} className="mr-2 text-[10px] font-bold uppercase tracking-widest text-[#2D2D2D]/60">Rate</span>
-                      {[1, 2, 3, 4, 5].map((n) => (
-                        <button key={n} onClick={() => rate(b._id, n)} className="text-[#0D0D0D] transition-transform hover:scale-110">
-                          <Star className="h-5 w-5 fill-current" />
-                        </button>
-                      ))}
+                  {!active && !ratedBookings.includes(b._id) && !submittedReviews[b._id] && (
+                    <div className="mt-4 border-t border-black/10 pt-4">
+                      <div className="flex flex-col gap-2">
+                        <textarea
+                          placeholder="How was your parking experience?"
+                          className="w-full rounded-xl border border-black/10 bg-[#F5F3EE] p-3 text-sm text-[#0D0D0D] placeholder-[#2D2D2D]/50 focus:border-[#0D0D0D] focus:outline-none"
+                          rows={2}
+                          value={feedbackInputs[b._id] || ""}
+                          onChange={(e) => setFeedbackInputs(prev => ({ ...prev, [b._id]: e.target.value }))}
+                        />
+                        <div className="flex items-center justify-between">
+                          <span style={display} className="text-[10px] font-bold uppercase tracking-widest text-[#2D2D2D]/60">Select Rating</span>
+                          <div className="flex gap-1">
+                            {[1, 2, 3, 4, 5].map((n) => (
+                              <button key={n} onClick={() => rate(b._id, n)} className="text-[#0D0D0D] transition-transform hover:scale-110">
+                                <Star className="h-6 w-6 fill-current" />
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {!active && (ratedBookings.includes(b._id) || submittedReviews[b._id]) && (
+                    <div className="mt-4 border-t border-black/10 pt-4">
+                      <div className="rounded-xl border border-black/10 bg-[#F5F3EE] p-4">
+                        <div className="flex items-center justify-between">
+                          <span style={display} className="text-[10px] font-bold uppercase tracking-widest text-[#2D2D2D]/60">Your Review</span>
+                          <div className="flex gap-0.5">
+                            {[1, 2, 3, 4, 5].map((n) => (
+                              <Star 
+                                key={n} 
+                                className={cn("h-4 w-4", n <= (submittedReviews[b._id]?.rating || 5) ? "fill-[#0D0D0D] text-[#0D0D0D]" : "text-black/10")} 
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        {submittedReviews[b._id]?.feedback && (
+                          <p className="mt-2 text-sm text-[#2D2D2D]">{submittedReviews[b._id].feedback}</p>
+                        )}
+                      </div>
                     </div>
                   )}
                 </motion.div>

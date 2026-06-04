@@ -34,7 +34,13 @@ export function Navbar() {
           <NavLink to="/malls">Browse Malls</NavLink>
           {user?.role === "user" && <NavLink to="/bookings">My Bookings</NavLink>}
           {user?.role === "mall-owner" && <NavLink to="/owner/malls">Owner Dashboard</NavLink>}
-          {user?.role === "admin" && <NavLink to="/admin/dashboard">Admin Panel</NavLink>}
+          {user?.role === "admin" && (
+            <>
+              <NavLink to="/admin/dashboard">Dashboard</NavLink>
+              <NavLink to="/admin/pending">Pending Approvals</NavLink>
+              <NavLink to="/admin/manage">Manage Malls</NavLink>
+            </>
+          )}
         </nav>
 
         {/* Right: theme + auth */}

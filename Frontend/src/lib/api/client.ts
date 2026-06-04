@@ -59,4 +59,5 @@ export interface Booking {
   fare?: number;
   status: "active" | "completed";
   qrCode?: string;
+  isRated?: boolean;
 }

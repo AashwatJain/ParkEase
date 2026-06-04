@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import {
@@ -19,7 +19,6 @@ export const Route = createFileRoute("/")({ component: Home });
 const display = { fontFamily: "'Space Grotesk', ui-sans-serif, system-ui, sans-serif" };
 const body = { fontFamily: "'DM Sans', ui-sans-serif, system-ui, sans-serif" };
 
-const cities = ["Mumbai", "Delhi", "Bangalore", "Pune", "Hyderabad"];
 
 function Home() {
   return (
@@ -132,7 +131,14 @@ function Home() {
 }
 
 function HeroLeft() {
-  const [activeCity, setActiveCity] = useState("Mumbai");
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate({ from: "/" });
+
+  const handleSearch = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    navigate({ to: "/malls", search: { q: searchQuery } });
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -149,7 +155,7 @@ function HeroLeft() {
         </div>
       </header>
 
-      <div className="space-y-8">
+      <form onSubmit={handleSearch} className="space-y-8">
         <h1 style={display} className="text-5xl font-bold leading-[0.9] tracking-tight sm:text-6xl lg:text-7xl">
           Where are<br />you headed?
         </h1>
@@ -157,40 +163,26 @@ function HeroLeft() {
         <div className="relative">
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search malls..."
             className="w-full border-b-2 border-[#0D0D0D] bg-transparent py-3 pr-10 text-lg placeholder-[#2D2D2D]/40 focus:outline-none"
             style={body}
           />
-          <Search className="absolute right-0 top-3.5 h-5 w-5 text-[#0D0D0D]" />
+          <button type="submit" className="absolute right-0 top-3.5 outline-none">
+            <Search className="h-5 w-5 text-[#0D0D0D]" />
+          </button>
         </div>
+      </form>
 
-        <div className="flex flex-wrap gap-2">
-          {cities.map((c) => (
-            <button
-              key={c}
-              onClick={() => setActiveCity(c)}
-              style={display}
-              className={`rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-colors ${
-                activeCity === c
-                  ? "bg-[#0D0D0D] text-[#F5F3EE]"
-                  : "border border-[#0D0D0D] text-[#0D0D0D] hover:bg-[#0D0D0D] hover:text-[#F5F3EE]"
-              }`}
-            >
-              {c}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <Link to="/malls" className="block">
-        <button
-          style={display}
-          className="group flex w-full items-center justify-center gap-3 bg-[#0D0D0D] py-5 text-xs font-bold uppercase tracking-widest text-[#F5F3EE] transition-colors hover:bg-emerald-700"
-        >
-          Find parking
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-        </button>
-      </Link>
+      <button
+        onClick={() => handleSearch()}
+        style={display}
+        className="group flex w-full items-center justify-center gap-3 bg-[#0D0D0D] py-5 text-xs font-bold uppercase tracking-widest text-[#F5F3EE] transition-colors hover:bg-emerald-700 block"
+      >
+        Find parking
+        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+      </button>
     </motion.div>
   );
 }

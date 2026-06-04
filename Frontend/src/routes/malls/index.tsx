@@ -1,23 +1,32 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Loader } from "@/components/ui/Loader";
 import { api, type Mall } from "@/lib/api/client";
 import { Search, MapPin, Star, Bike, Car } from "lucide-react";
 
-export const Route = createFileRoute("/malls/")({ component: MallsPage });
+export const Route = createFileRoute("/malls/")({
+  component: MallsPage,
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      q: (search.q as string) || "",
+    };
+  },
+});
 
 const display = { fontFamily: "'Space Grotesk', ui-sans-serif, system-ui, sans-serif" };
 
 function MallsPage() {
+  const { q } = Route.useSearch();
   const [malls, setMalls] = useState<Mall[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [city, setCity] = useState("");
+  const [search, setSearch] = useState(q || "");
 
-  const fetchMalls = async () => {
+  const fetchMalls = async (searchOverride?: string) => {
     setLoading(true);
     try {
-      const { data } = await api.get("/malls", { params: { name: search, address: city } });
+      const { data } = await api.get("/malls", { params: { name: searchOverride !== undefined ? searchOverride : search } });
       setMalls(data.malls ?? data ?? []);
     } catch {
       setMalls([]);
@@ -27,10 +36,9 @@ function MallsPage() {
   };
 
   useEffect(() => {
-    fetchMalls();
+    fetchMalls(q);
   }, []);
 
-  const cities = Array.from(new Set(malls.map((m) => m.city))).sort();
 
   return (
     <div className="bg-[#F5F3EE]">
@@ -61,17 +69,7 @@ function MallsPage() {
                 className="w-full rounded-xl bg-[#F5F3EE] py-3 pl-11 pr-4 text-sm text-[#0D0D0D] placeholder:text-[#2D2D2D]/40 focus:outline-none focus:ring-2 focus:ring-[#0D0D0D]/20"
               />
             </div>
-            <select
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              style={display}
-              className="rounded-xl bg-[#F5F3EE] px-4 py-3 text-xs font-bold uppercase tracking-widest text-[#0D0D0D] focus:outline-none focus:ring-2 focus:ring-[#0D0D0D]/20"
-            >
-              <option value="">All cities</option>
-              {cities.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
+
             <button
               onClick={fetchMalls}
               style={display}
@@ -86,11 +84,7 @@ function MallsPage() {
       {/* Grid */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         {loading ? (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-52 animate-pulse rounded-2xl bg-[#E8E4DD]" />
-            ))}
-          </div>
+          <Loader text="Loading Malls" />
         ) : malls.length === 0 ? (
           <p className="py-20 text-center text-sm text-[#2D2D2D]/60">No malls found.</p>
         ) : (

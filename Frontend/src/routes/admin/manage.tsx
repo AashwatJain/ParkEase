@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { api } from "@/lib/api/client";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { Loader } from "@/components/ui/Loader";
 import { MapPin, Car, CheckCircle, IndianRupee } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -35,13 +36,16 @@ interface MallStat {
 
 function Manage() {
   const [malls, setMalls] = useState<MallStat[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchAll = async () => {
     try {
       const { data } = await api.get("/admin/all-malls");
       // Backend returns array directly (not wrapped in {malls})
       setMalls(Array.isArray(data) ? data : data.malls ?? data ?? []);
-    } catch {}
+    } catch {} finally {
+      setLoading(false);
+    }
   };
   useEffect(() => { fetchAll(); }, []);
 
@@ -54,8 +58,11 @@ function Manage() {
       />
 
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        <div className="space-y-4">
-          {malls.map((m, i) => (
+        {loading ? (
+          <Loader text="Loading Platform Stats" />
+        ) : (
+          <div className="space-y-4">
+            {malls.map((m, i) => (
             <motion.div
               key={`${m.name}-${i}`}
               initial={{ opacity: 0, y: 12 }}
@@ -99,7 +106,8 @@ function Manage() {
             </motion.div>
           ))}
           {malls.length === 0 && <p className="py-20 text-center text-sm text-[#2D2D2D]/60">No malls yet.</p>}
-        </div>
+          </div>
+        )}
       </section>
     </div>
   );
