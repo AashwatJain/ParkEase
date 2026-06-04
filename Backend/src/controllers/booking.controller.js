@@ -57,14 +57,14 @@ const exit = asyncHandler(async (req, res) => {
   const { id: userId } = req.user;
 
   const booking = await Booking.findById(bookingId)
-    .populate("mall", "name city")
+    .populate("mall")
     .populate("floor", "floorNumber")
     .populate("slot", "slotNumber");
 
   if (!booking) throw new ApiError(404, "Booking not found");
 
-  if (booking.user.toString() !== userId.toString())
-    throw new ApiError(403, "Forbidden");
+  if (!booking.mall.owner.equals(userId) && req.user.role !== "admin")
+    throw new ApiError(403, "You can only exit vehicles from your own mall");
 
   if (booking.status === "completed")
     throw new ApiError(400, "Booking already completed");

@@ -15,7 +15,7 @@ router.use(verifyJWT);
 router.use(authorizeRoles("user", "admin", "mall-owner"));
 
 router.post("/entry", entry);
-router.patch("/exit/:bookingId", exit);
+router.patch("/exit/:bookingId", authorizeRoles("mall-owner", "admin"), exit);
 router.get("/my", getBookings);
 router.get("/:bookingId", getBooking);
 router.post("/verify-qr", authorizeRoles("mall-owner", "admin"), verifyQr);
