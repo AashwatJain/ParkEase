@@ -28,14 +28,17 @@ export function Footer() {
 
           <FooterCol title="Product">
             <FooterLink to="/malls">Browse Malls</FooterLink>
-            <FooterLink to="/owner/register-mall">For Owners</FooterLink>
             <FooterLink to="/bookings">My Bookings</FooterLink>
           </FooterCol>
 
-          <FooterCol title="Company">
-            <FooterLink to="/">About</FooterLink>
-            <FooterLink to="/">Contact</FooterLink>
-            <FooterLink to="/">Privacy</FooterLink>
+          <FooterCol title="For Owners">
+            <FooterLink to="/owner/malls">Owner Dashboard</FooterLink>
+            <FooterLink to="/owner/register-mall">Register Mall</FooterLink>
+          </FooterCol>
+
+          <FooterCol title="Account">
+            <FooterLink to="/login">Login</FooterLink>
+            <FooterLink to="/register">Register</FooterLink>
           </FooterCol>
         </div>
 
