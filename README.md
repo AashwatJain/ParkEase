@@ -27,10 +27,11 @@ A full-stack mall parking platform with real-time slot availability, QR-based en
 
 | Feature | Description |
 |---------|-------------|
-| 🔐 **Multi-Role Auth** | User, Mall Owner, Super Admin — JWT + HTTP-only cookies |
+| 🔐 **Multi-Role Auth** | User, Mall Owner, Super Admin, Guard — JWT + HTTP-only cookies |
 | 🏢 **Mall Registration** | Owner registers → Admin approves/rejects with reason |
+| 👮 **Guard Scanner** | Owner registers guards, guards verify QR and complete exits |
 | 🅿️ **Auto Slot Allotment** | Atomic `findOneAndUpdate` — zero double bookings |
-| 📱 **QR Code System** | QR generated at entry, verified by guard/owner at gate |
+| 📱 **QR Code System** | QR generated at entry, verified by guard at gate |
 | 💰 **Duration Billing** | `ceil(hours) × rate` — pay only for time parked |
 | 📊 **Owner Dashboard** | Grand total stats + per-mall breakdown (slots, revenue) |
 | ⭐ **Rating System** | 1-5 stars + feedback after completed booking (ownership + completion enforced) |
@@ -203,6 +204,7 @@ CORS_ORIGIN=*
 | GET | `/dashboard` | Grand total: all malls combined — slots, today's revenue |
 | GET | `/mall-stats` | Per-mall breakdown: available, occupied, total revenue |
 | GET | `/ratings/:mallId` | Per-mall rating distribution (1-5 star counts) |
+| POST | `/guard` | Register a new guard and assign to a mall |
 
 ### Admin — `/api/admin`
 | Method | Endpoint | Description |
@@ -236,8 +238,9 @@ User arrives → Selects vehicle type → Enters vehicle number
 | Role | Access |
 |------|--------|
 | **User** | Browse malls, book parking, exit & pay, rate completed bookings |
-| **Mall Owner** | Register mall, manage floors/slots, dashboard stats, QR verify, view ratings |
+| **Mall Owner** | Register mall, manage floors/slots, dashboard stats, QR verify, view ratings, register guards |
 | **Super Admin** | Approve/reject malls, ban/unban users, platform-wide stats, all malls overview |
+| **Guard** | Scan exit tickets (QR code), verify authenticity/assigned mall, process exits |
 
 ---
 
