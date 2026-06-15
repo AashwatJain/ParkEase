@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://parkease-pe0d.onrender.com/api/:path*"
+    }
+  ]
+}

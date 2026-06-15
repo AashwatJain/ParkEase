@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "https://parkease-pe0d.onrender.com/api",
+  baseURL: "/api",
   withCredentials: true,
 });
 
