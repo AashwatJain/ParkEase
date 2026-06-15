@@ -2,15 +2,6 @@
 
 A full-stack mall parking platform with real-time slot availability, QR-based entry/exit, duration-based billing, and multi-role access control. **Frontend vibecoded using [Lovable](https://lovable.dev) 🎨**
 
-### 🌐 Live Demo
-
-| | URL |
-|---|---|
-| **Frontend** | [https://park-ease-two.vercel.app](https://park-ease-two.vercel.app) |
-| **Backend API** | [https://parkease-pe0d.onrender.com/api](https://parkease-pe0d.onrender.com/api) |
-
-> ⚠️ Backend is hosted on Render free tier — first request may take ~30s to wake up.
-
 > 📄 For detailed problem statement, schemas, and API design — see [PROBLEM_STATEMENT.md](Backend/PROBLEM_STATEMENT.md)
 
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=node.js&logoColor=white)
@@ -18,8 +9,7 @@ A full-stack mall parking platform with real-time slot availability, QR-based en
 ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat&logo=mongodb&logoColor=white)
 ![React](https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind-06B6D4?style=flat&logo=tailwindcss&logoColor=white)
-![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat&logo=vercel&logoColor=white)
-![Render](https://img.shields.io/badge/Render-46E3B7?style=flat&logo=render&logoColor=white)
+
 
 ---
 
