@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "/api" : "https://parkease-pe0d.onrender.com/api"),
+  baseURL: "https://parkease-pe0d.onrender.com/api",
   withCredentials: true,
 });
 
