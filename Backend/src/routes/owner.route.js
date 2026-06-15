@@ -6,6 +6,7 @@ import {
   getOwnerDashboardStats,
   getMallWiseStats,
   getOwnerRatings,
+  registerGuard,
 } from "../controllers/owner.controller.js";
 
 const router = express.Router();
@@ -16,5 +17,6 @@ router.get("/malls", getOwnerMalls);
 router.get("/dashboard", getOwnerDashboardStats);
 router.get("/mall-stats", getMallWiseStats);
 router.get("/ratings/:mallId", getOwnerRatings);
+router.post("/guard", registerGuard);
 
 export default router;

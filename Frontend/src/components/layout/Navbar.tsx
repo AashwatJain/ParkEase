@@ -31,9 +31,20 @@ export function Navbar() {
 
         {/* Center: nav */}
         <nav className="hidden items-center justify-center gap-1 md:flex">
-          <NavLink to="/malls">Browse Malls</NavLink>
+          {(!user || user.role === "user" || user.role === "mall-owner") && (
+            <NavLink to="/malls">Browse Malls</NavLink>
+          )}
           {user?.role === "user" && <NavLink to="/bookings">My Bookings</NavLink>}
-          {user?.role === "mall-owner" && <NavLink to="/owner/malls">Owner Dashboard</NavLink>}
+          
+          {user?.role === "mall-owner" && (
+            <>
+              <NavLink to="/owner/malls">Owner Dashboard</NavLink>
+              <NavLink to="/owner/guards">Manage Guards</NavLink>
+            </>
+          )}
+          
+          {user?.role === "guard" && <NavLink to="/guard/scan">Scanner</NavLink>}
+          
           {user?.role === "admin" && (
             <>
               <NavLink to="/admin/dashboard">Dashboard</NavLink>

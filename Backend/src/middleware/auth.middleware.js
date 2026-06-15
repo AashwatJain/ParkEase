@@ -8,16 +8,17 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
   if (!token) throw new ApiError(401, "Unauthorized request. No token found");
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = {
-      id: decoded.id,
-      role: decoded.role,
-    };
-
     const user = await User.findById(decoded.id);
 
     if (user?.isBanned) {
       throw new ApiError(401, "User is banned");
     }
+
+    req.user = {
+      id: decoded.id,
+      role: decoded.role,
+      assignedMall: user.assignedMall,
+    };
 
     next();
   } catch (error) {

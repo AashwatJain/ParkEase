@@ -25,8 +25,12 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["user", "mall-owner", "admin"],
+      enum: ["user", "mall-owner", "admin", "guard"],
       default: "user",
+    },
+    assignedMall: {
+      type: mongoose.Types.ObjectId,
+      ref: "Mall",
     },
     isBanned: {
       type: Boolean,

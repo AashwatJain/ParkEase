@@ -12,12 +12,11 @@ import {
 const router = express.Router();
 
 router.use(verifyJWT);
-router.use(authorizeRoles("user", "admin", "mall-owner"));
 
-router.post("/entry", entry);
-router.patch("/exit/:bookingId", authorizeRoles("mall-owner", "admin"), exit);
-router.get("/my", getBookings);
-router.get("/:bookingId", getBooking);
-router.post("/verify-qr", authorizeRoles("mall-owner", "admin"), verifyQr);
+router.post("/entry", authorizeRoles("user", "admin", "mall-owner"), entry);
+router.patch("/exit/:bookingId", authorizeRoles("mall-owner", "admin", "guard"), exit);
+router.get("/my", authorizeRoles("user", "admin", "mall-owner"), getBookings);
+router.get("/:bookingId", authorizeRoles("user", "admin", "mall-owner", "guard"), getBooking);
+router.post("/verify-qr", authorizeRoles("mall-owner", "admin", "guard"), verifyQr);
 
 export default router;

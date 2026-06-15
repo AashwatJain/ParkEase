@@ -18,7 +18,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as MallsIndexRouteImport } from './routes/malls/index'
 import { Route as OwnerRegisterMallRouteImport } from './routes/owner/register-mall'
 import { Route as OwnerMallsRouteImport } from './routes/owner/malls'
+import { Route as OwnerGuardsRouteImport } from './routes/owner/guards'
 import { Route as MallsMallIdRouteImport } from './routes/malls/$mallId'
+import { Route as GuardScanRouteImport } from './routes/guard/scan'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminPendingRouteImport } from './routes/admin/pending'
 import { Route as AdminManageRouteImport } from './routes/admin/manage'
@@ -71,9 +73,19 @@ const OwnerMallsRoute = OwnerMallsRouteImport.update({
   path: '/malls',
   getParentRoute: () => OwnerRoute,
 } as any)
+const OwnerGuardsRoute = OwnerGuardsRouteImport.update({
+  id: '/guards',
+  path: '/guards',
+  getParentRoute: () => OwnerRoute,
+} as any)
 const MallsMallIdRoute = MallsMallIdRouteImport.update({
   id: '/malls/$mallId',
   path: '/malls/$mallId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuardScanRoute = GuardScanRouteImport.update({
+  id: '/guard/scan',
+  path: '/guard/scan',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
@@ -118,7 +130,9 @@ export interface FileRoutesByFullPath {
   '/admin/manage': typeof AdminManageRoute
   '/admin/pending': typeof AdminPendingRoute
   '/admin/users': typeof AdminUsersRoute
+  '/guard/scan': typeof GuardScanRoute
   '/malls/$mallId': typeof MallsMallIdRoute
+  '/owner/guards': typeof OwnerGuardsRoute
   '/owner/malls': typeof OwnerMallsRoute
   '/owner/register-mall': typeof OwnerRegisterMallRoute
   '/malls/': typeof MallsIndexRoute
@@ -136,7 +150,9 @@ export interface FileRoutesByTo {
   '/admin/manage': typeof AdminManageRoute
   '/admin/pending': typeof AdminPendingRoute
   '/admin/users': typeof AdminUsersRoute
+  '/guard/scan': typeof GuardScanRoute
   '/malls/$mallId': typeof MallsMallIdRoute
+  '/owner/guards': typeof OwnerGuardsRoute
   '/owner/malls': typeof OwnerMallsRoute
   '/owner/register-mall': typeof OwnerRegisterMallRoute
   '/malls': typeof MallsIndexRoute
@@ -155,7 +171,9 @@ export interface FileRoutesById {
   '/admin/manage': typeof AdminManageRoute
   '/admin/pending': typeof AdminPendingRoute
   '/admin/users': typeof AdminUsersRoute
+  '/guard/scan': typeof GuardScanRoute
   '/malls/$mallId': typeof MallsMallIdRoute
+  '/owner/guards': typeof OwnerGuardsRoute
   '/owner/malls': typeof OwnerMallsRoute
   '/owner/register-mall': typeof OwnerRegisterMallRoute
   '/malls/': typeof MallsIndexRoute
@@ -175,7 +193,9 @@ export interface FileRouteTypes {
     | '/admin/manage'
     | '/admin/pending'
     | '/admin/users'
+    | '/guard/scan'
     | '/malls/$mallId'
+    | '/owner/guards'
     | '/owner/malls'
     | '/owner/register-mall'
     | '/malls/'
@@ -193,7 +213,9 @@ export interface FileRouteTypes {
     | '/admin/manage'
     | '/admin/pending'
     | '/admin/users'
+    | '/guard/scan'
     | '/malls/$mallId'
+    | '/owner/guards'
     | '/owner/malls'
     | '/owner/register-mall'
     | '/malls'
@@ -211,7 +233,9 @@ export interface FileRouteTypes {
     | '/admin/manage'
     | '/admin/pending'
     | '/admin/users'
+    | '/guard/scan'
     | '/malls/$mallId'
+    | '/owner/guards'
     | '/owner/malls'
     | '/owner/register-mall'
     | '/malls/'
@@ -226,6 +250,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   OwnerRoute: typeof OwnerRouteWithChildren
   RegisterRoute: typeof RegisterRoute
+  GuardScanRoute: typeof GuardScanRoute
   MallsMallIdRoute: typeof MallsMallIdRoute
   MallsIndexRoute: typeof MallsIndexRoute
 }
@@ -295,11 +320,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OwnerMallsRouteImport
       parentRoute: typeof OwnerRoute
     }
+    '/owner/guards': {
+      id: '/owner/guards'
+      path: '/guards'
+      fullPath: '/owner/guards'
+      preLoaderRoute: typeof OwnerGuardsRouteImport
+      parentRoute: typeof OwnerRoute
+    }
     '/malls/$mallId': {
       id: '/malls/$mallId'
       path: '/malls/$mallId'
       fullPath: '/malls/$mallId'
       preLoaderRoute: typeof MallsMallIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guard/scan': {
+      id: '/guard/scan'
+      path: '/guard/scan'
+      fullPath: '/guard/scan'
+      preLoaderRoute: typeof GuardScanRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/users': {
@@ -364,6 +403,7 @@ const AdminRouteChildren: AdminRouteChildren = {
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface OwnerRouteChildren {
+  OwnerGuardsRoute: typeof OwnerGuardsRoute
   OwnerMallsRoute: typeof OwnerMallsRoute
   OwnerRegisterMallRoute: typeof OwnerRegisterMallRoute
   OwnerDashboardMallIdRoute: typeof OwnerDashboardMallIdRoute
@@ -371,6 +411,7 @@ interface OwnerRouteChildren {
 }
 
 const OwnerRouteChildren: OwnerRouteChildren = {
+  OwnerGuardsRoute: OwnerGuardsRoute,
   OwnerMallsRoute: OwnerMallsRoute,
   OwnerRegisterMallRoute: OwnerRegisterMallRoute,
   OwnerDashboardMallIdRoute: OwnerDashboardMallIdRoute,
@@ -386,6 +427,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   OwnerRoute: OwnerRouteWithChildren,
   RegisterRoute: RegisterRoute,
+  GuardScanRoute: GuardScanRoute,
   MallsMallIdRoute: MallsMallIdRoute,
   MallsIndexRoute: MallsIndexRoute,
 }

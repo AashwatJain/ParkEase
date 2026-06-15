@@ -20,10 +20,13 @@ function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post("/auth/login", { email, password });
+      const { data } = await api.post("/auth/login", { email, password });
       await refresh();
       toast.success("Welcome back!");
-      nav({ to: "/" });
+      if (data.user?.role === "guard") nav({ to: "/guard/scan" });
+      else if (data.user?.role === "mall-owner") nav({ to: "/owner/malls" });
+      else if (data.user?.role === "admin") nav({ to: "/admin" });
+      else nav({ to: "/" });
     } catch (err: any) {
       toast.error(err?.response?.data?.message || "Login failed");
     } finally {

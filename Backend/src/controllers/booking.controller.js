@@ -54,7 +54,7 @@ const entry = asyncHandler(async (req, res) => {
 
 const exit = asyncHandler(async (req, res) => {
   const { bookingId } = req.params;
-  const { id: userId } = req.user;
+  const { id: userId, role, assignedMall } = req.user;
 
   const booking = await Booking.findById(bookingId)
     .populate("mall")
@@ -63,8 +63,17 @@ const exit = asyncHandler(async (req, res) => {
 
   if (!booking) throw new ApiError(404, "Booking not found");
 
-  if (!booking.mall.owner.equals(userId) && req.user.role !== "admin")
-    throw new ApiError(403, "You can only exit vehicles from your own mall");
+  if (role === "guard") {
+    if (!assignedMall || !assignedMall.equals(booking.mall._id)) {
+      throw new ApiError(403, "You can only exit vehicles from your assigned mall");
+    }
+  } else if (role === "mall-owner") {
+    if (!booking.mall.owner.equals(userId)) {
+      throw new ApiError(403, "You can only exit vehicles from your own mall");
+    }
+  } else if (role !== "admin") {
+    throw new ApiError(403, "Forbidden");
+  }
 
   if (booking.status === "completed")
     throw new ApiError(400, "Booking already completed");
@@ -124,7 +133,7 @@ const getBookings = asyncHandler(async (req, res) => {
 
 const verifyQr = asyncHandler(async (req, res) => {
   const { bookingId } = req.body;
-  const ownerId = req.user.id;
+  const { id: userId, role, assignedMall } = req.user;
 
   if (!bookingId) {
     throw new ApiError(400, "Booking ID is required from QR payload");
@@ -139,13 +148,23 @@ const verifyQr = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Invalid QR: Booking not found");
   }
 
-  if (!booking.mall.owner.equals(ownerId) && req.user.role !== "admin") {
-    throw new ApiError(403, "Forbidden: You cannot scan QRs for other malls");
+  if (role === "guard") {
+    if (!assignedMall || !assignedMall.equals(booking.mall._id)) {
+      throw new ApiError(403, "Forbidden: You cannot scan QRs for other malls");
+    }
+  } else if (role === "mall-owner") {
+    if (!booking.mall.owner.equals(userId)) {
+      throw new ApiError(403, "Forbidden: You cannot scan QRs for other malls");
+    }
+  } else if (role !== "admin") {
+    throw new ApiError(403, "Forbidden");
   }
 
   if (booking.status === "completed") {
     throw new ApiError(400, "QR Expired: This booking is already completed");
   }
+
+  const fare = await booking.calculateFare(new Date());
 
   res.status(200).json(
     new ApiResponse(
@@ -156,6 +175,7 @@ const verifyQr = asyncHandler(async (req, res) => {
         slot: booking.slot.slotNumber,
         floor: booking.floor.floorNumber,
         status: booking.status,
+        fare,
       },
       "QR Verified Successfully"
     )

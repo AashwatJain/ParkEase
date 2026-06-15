@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.utils.js";
 import { ApiError } from "../utils/ApiError.utils.js";
 import { ApiResponse } from "../utils/ApiResponse.utils.js";
 import { Mall } from "../models/mall.model.js";
+import { User } from "../models/user.model.js";
 import { Floor } from "../models/floor.model.js";
 import { Slot } from "../models/slot.model.js";
 import { Booking } from "../models/booking.model.js";
@@ -193,9 +194,44 @@ const getOwnerRatings = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, { data }, "Request successfull"));
 });
 
+const registerGuard = asyncHandler(async (req, res) => {
+  const { username, email, password, mallId } = req.body;
+  const ownerId = req.user.id;
+
+  if (!username || !email || !password || !mallId) {
+    throw new ApiError(400, "All fields are required (username, email, password, mallId)");
+  }
+
+  const mall = await Mall.findById(mallId);
+  if (!mall) throw new ApiError(404, "Mall not found");
+
+  if (!mall.owner.equals(ownerId) && req.user.role !== "admin") {
+    throw new ApiError(403, "You can only assign guards to your own mall");
+  }
+
+  const existedUser = await User.findOne({
+    $or: [{ username }, { email }],
+  });
+
+  if (existedUser) throw new ApiError(409, "User already exists");
+
+  const guard = await User.create({
+    username,
+    email,
+    password,
+    role: "guard",
+    assignedMall: mallId,
+  });
+
+  guard.password = undefined;
+
+  res.status(201).json(new ApiResponse(201, { guard }, "Guard registered successfully"));
+});
+
 export {
   getOwnerMalls,
   getOwnerDashboardStats,
   getMallWiseStats,
   getOwnerRatings,
+  registerGuard,
 };
